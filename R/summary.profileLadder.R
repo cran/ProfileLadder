@@ -153,6 +153,11 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
                          pch = 22, pt.bg = c("lightblue", "darkred"),
                fill = "lightgray", border = "lightgray", box.lwd = 0, 
                box.col = "white", bg = "white")
+      } else {
+        graphics::legend("topright", legend = paste("Estimated Reserve:", reserve[3], sep = " "), 
+                         pch = 22, pt.bg = c("lightblue"),
+                         fill = "lightgray", border = "lightgray", box.lwd = 0, 
+                         box.col = "white", bg = "white")
       }
     }
   }

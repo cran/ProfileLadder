@@ -1,4 +1,4 @@
-d8789f33d34d792f9219db5222c82b4d *DESCRIPTION
+7ab15ca1b7b90708cd42bea3c31a849a *DESCRIPTION
 bcd8d7f2dd788984853b350f4339ae45 *NAMESPACE
 f18e3166ec8f3838c4cce5eb8dba9a31 *R/CameronMutual.R
 9fc07f7cf4b26db30ac037b6153f4b3d *R/GFCIB.R
@@ -15,9 +15,9 @@ a67fb4645d731ebfa2896385faf7150b *R/plot.permutedReserve.R
 bb547388130f5854e5a96fc588c62650 *R/plot.profileLadder.R
 ccfd4bf83472a11af980e46b4a29048c *R/print.permutedReserve.R
 a7f8afbe0173c0f2c643f89e404e5064 *R/print.profileLadder.R
-789fa9413c534e2ba4571905b1406de0 *R/summary.profileLadder.R
+a3984b25f189b3b2380a4af2dbe6476d *R/summary.profileLadder.R
 04139f629ede4459c2a07a59bd1d1182 *R/xNetSubscribe.R
-b85cf01717b881519b53436c2b7b4c02 *README.md
+ec96392c243fac5607c9c5e9afb7e298 *README.md
 5e8c648ce7d8a81b0129a4b992b1750b *data/CameronMutual.rda
 8b7de0112263127338f76333bd8bb882 *data/GFCIB.rda
 b49892f8ce557aa9f36d18dcb12ed83f *data/MidwestMutual.rda
