@@ -2,16 +2,14 @@
 % Please edit documentation in R/incrExplor.R
 \name{incrExplor}
 \alias{incrExplor}
-\title{Exploratory function for run-off triange increments}
+\title{Exploratory Function for Run-Off Triangle Increments}
 \usage{
 incrExplor(
   triangle,
   method = c("median", "mean", "max", "min"),
   out = 1,
   states = NULL,
-  breaks = NULL,
-  plotOption = FALSE,
-  plotScale = 1
+  breaks = NULL
 )
 }
 \arguments{
@@ -50,24 +48,17 @@ of the Markov chain states is requested by \code{states}) then the value of
 (i.e., numeric vectors are provided for both) then the set of states in
 \code{states} must be given in a way that exactly one state value belongs to
 exactly one bin defined by the break points specified by \code{breaks}}
-
-\item{plotOption}{logical to indicate whether a graphical output supplementing
-the empirical exploratory should be provided (\code{TRUE})
-or not (\code{FALSE} -- DEFAULT)}
-
-\item{plotScale}{positive scaling factor for adjusting the overall graphical
-output (the DEFAULT value is \code{plotScale = 1})}
 }
 \value{
-A list with the following elements:
+An object of the class \code{mcSetup} with the following elements:
 \item{incrTriangle}{an object of the class \code{triangle} with the incremental
 run-off triangle}
 \item{triangleType}{type of the input run-off triangle provided for the input
 object \code{triangle} (cumulative or incremental)}
-\item{defaultStates}{the set of explicit states as used (by DEFAULT) by the
-\code{mcReserve()} estimation algorithm}
-\item{defaultBreaks}{the set of explicit breaks as used (by DEFAULT) by the
-\code{mcReserve()} estimation algorithm}
+\item{defaultStates}{the data-driven set of explicit states as used (by DEFAULT)
+by the \code{mcReserve()} function -- the MACRAME prediction algorithm}
+\item{defaultBreaks}{the set of explicit data-driven breaks as used (by DEFAULT)
+by the \code{mcReserve()} function -- the MACRAME prediction algorithm}
 \item{increments}{table with basic empirical characteristics of the increments
 of the input run-off triangle (without the first origin payments---the values
 in the first column of the run-off triangle). Two sets of increments are provided:

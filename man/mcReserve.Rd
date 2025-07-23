@@ -2,15 +2,14 @@
 % Please edit documentation in R/mcReserve.R
 \name{mcReserve}
 \alias{mcReserve}
-\title{MACRAME based development profile reserve}
+\title{MACRAME Based Development Profile Reserve}
 \usage{
 mcReserve(
   chainLadder,
   cum = TRUE,
   residuals = FALSE,
   states = NULL,
-  breaks = NULL,
-  MC = FALSE
+  breaks = NULL
 )
 }
 \arguments{
@@ -62,11 +61,6 @@ the breaks can be also specified by a set of finite numbers defining again
 \code{k} bins---in such cases, the parameter \code{states} should be of the
 length \code{length(states) = k + 1}. Each value in \code{states} should
 represent one bin defined by \code{breaks}}
-
-\item{MC}{logical (by DEFAULT set to \code{FALSE}) to indicate whether some
-backgrpound information about the underlying Markov chain process
-(e.g., Markov chain states or the estimated transition probability matrix)
-should be printed in the output or not}
 }
 \value{
 An object of the type \code{list} with with the following elements:
@@ -104,19 +98,22 @@ if (requireNamespace("ChainLadder")) {
 data(MW2014, package = "ChainLadder")
 print(MW2014) 
 
-## MACRAME prediction  with (DEFAULT) Markov chain setting 
-## provided in the output
-mcReserve(MW2014, residuals = TRUE, MC = TRUE)}
+## MACRAME reserve prediction with the DEFAULT Markov chain setting 
+mcReserve(MW2014, residuals = TRUE)}
 
-## completed run-off triangle with 'unknown' truth (lower-bottom run-off triangle)  
-## with incremental residuals (true increments minus predicted ones) being provided 
+## complete run-off triangle with 'unknown' truth (lower-bottom run-off triangle)  
+## with incremental residuals (true increments minus predicted ones)  
 data(CameronMutual)
 mcReserve(CameronMutual, residuals = TRUE)
 
-## the same output in terms of the reserve estimate but back-fitted residuals 
-## are provided instead (as the run-off triangle is provided only)
+## the same output in terms of the reserve prediction but back-fitted residuals 
+## are provided instead (as the run-off triangle only is provided)
 data(observed(CameronMutual))
 mcReserve(observed(CameronMutual), residuals = TRUE)
+
+## MACRAME reserve prediction with the underlying Markov chain with five 
+## explicit Markov chain states
+mcReserve(CameronMutual, residuals = TRUE, states = c(200, 600, 1000))
 
 }
 \references{
@@ -124,5 +121,5 @@ Maciak, M., Mizera, I., and Pešta, M. (2022). Functional Profile
 Techniques for Claims Reserving. ASTIN Bulletin, 52(2), 449-482. DOI:10.1017/asb.2022.4
 }
 \seealso{
-\code{\link[=incrExplor]{incrExplor()}}, \code{\link[=permuteReserve]{permuteReserve()}}
+\code{\link[=incrExplor]{incrExplor()}}, \code{\link[=permuteReserve]{permuteReserve()}}, \code{\link[=mcBreaks]{mcBreaks()}}, \code{\link[=mcStates]{mcStates()}}, \code{\link[=mcTrans]{mcTrans()}}
 }

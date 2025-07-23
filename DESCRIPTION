@@ -1,7 +1,7 @@
 Package: ProfileLadder
 Type: Package
 Title: Functional Profile Chain Ladder for Claims Reserving
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: c( 
     person(given = "Matúš", family = "Maciak", email = "maciak@karlin.mff.cuni.cz", role = c("aut", "cre")), 
     person(given = "Rastislav", family = "Matúš", role = c("ctb")), 
@@ -15,7 +15,7 @@ Imports: ChainLadder (>= 0.2.12), raw (>= 0.1.8)
 LazyData: true
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
-Packaged: 2025-06-11 11:40:48 UTC; maciak
+Packaged: 2025-07-23 16:27:36 UTC; maciak
 Maintainer: Matúš Maciak <maciak@karlin.mff.cuni.cz>
 NeedsCompilation: no
 Author: Matúš Maciak [aut, cre],
@@ -23,4 +23,4 @@ Author: Matúš Maciak [aut, cre],
   Ivan Mizera [aut],
   Michal Pešta [aut]
 Repository: CRAN
-Date/Publication: 2025-06-11 13:20:02 UTC
+Date/Publication: 2025-07-23 17:20:07 UTC

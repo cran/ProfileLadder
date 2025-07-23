@@ -1,4 +1,4 @@
-#' Data provider monthly income 
+#' Internet Provider Monthly Income Data
 #'
 #' An illustrative dataset---a matrix (of the dimensions 12\code{x}12) with a 
 #' monthly-based income (in EUR) of a local internet data provider with the 

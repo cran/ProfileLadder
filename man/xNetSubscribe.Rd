@@ -3,7 +3,7 @@
 \docType{data}
 \name{xNetSubscribe}
 \alias{xNetSubscribe}
-\title{Data provider monthly income}
+\title{Internet Provider Monthly Income Data}
 \format{
 \subsection{xNetSubscribe}{
 

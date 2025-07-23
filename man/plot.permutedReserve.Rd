@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.permutedReserve.R
 \name{plot.permutedReserve}
 \alias{plot.permutedReserve}
-\title{Plotting the output of the permutation bootstrap}
+\title{Plotting the Output of the Permutation Bootstrap}
 \usage{
 \method{plot}{permutedReserve}(x, ...)
 }

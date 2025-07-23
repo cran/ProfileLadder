@@ -1,4 +1,4 @@
-#' Summary method for an object of the S3 class method \code{profileLadder}
+#' Summary Method for Objects of the S3 Class Method \code{profileLadder}
 #'
 #' The function provides an overall summary of the output from the functions 
 #' parallelReserve() and mcReserve() (summary of the object of the class
@@ -96,39 +96,49 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
   if (is.na(sTable[n,3])){dev2date <- NA} else 
     {dev2date <- format(round(100 * sTable[n,3], 2), nsmall = 2)}
  
-  reserveSummary <- as.numeric(c(sum(chainLadder[last]), estimatedReserve, reserve[4], 
-                                 estimationAccuracy, dev2date))
-  names(reserveSummary) <- c("Paid Amount","   Estimated Reserve", 
-                             "   True Reserve", "  Reserve%", "   Dev.To.Date")
+  reserveSummary <- as.numeric(c(sum(chainLadder[last]), sum(completedLadder[,n]), 
+                                 estimatedReserve, reserve[4], estimationAccuracy))
+  names(reserveSummary) <- c("Paid Amount", "   Est.Ultimate" ,"   Est.Reserve", 
+                             "   True Reserve", "  Reserve%")
 
-  output <- list()
-  output$origins <- sTable
-  output$overall <- reserveSummary
-  
   if (method == "Run-off"){### run-off triangle only
-    print(paste(method, " triangle", sep = ""))
+    cat(method, "triangle (no estimation algorithm applied)\n")
+    print(sTable)
+    cat("\n")
   } else {### estimated triangle (PARALLAX, REACT, MACRAME)
-    print(paste(method, " estimated reserve", sep = ""))
+    cat(method, "estimated reserve (by origins)\n")
+    print(sTable)
+    cat("\n")
+    
+    message("Overall reserve summary")
+    print(reserveSummary)
+    cat("\n")
   }
-  
   
   ### 2. summary of residuals
   if (!is.null(object$residuals)){
     if (all(is.na(object$residuals[observed(n)]))){### standard residuals
-      residType <- "(standard incremental residuals)" 
+      residType <- "Residual summary (standard incremental residuals)" 
       xLabName <- "Standard incremental residuals"
     } else {### backfitted residuals
-      residType <- "(backfitted incremental residuals)"
+      residType <- "Residual summary (backfitted incremental residuals)"
       xLabName <- "Backfitted incremental residuals"
     }
     
-    message(residType)
     resids <- object$residuals[!is.na(object$residuals)]
-    residSummary <- c(round(as.numeric(summary(resids))), round(stats::sd(resids)), 
-                      length(resids))
+    residSummary <- c(round(as.numeric(summary(resids))), round(stats::sd(resids)))
     names(residSummary) <- c(" Min", " 1st Q.", " Median", " Mean", " 3rd Q.", 
-                             " Max", " Std.Er.", " Total")
-
+                             " Max", " Std.Er.")
+    ### print output
+    message(residType)
+    print(residSummary)
+    cat("\n")
+    cat(paste("Total number of residuals: ", length(resids), 
+                ",  Total number of unique residuals: ", length(unique(resids)), "\n", sep = ""))
+    cat(paste("Suspicious residuals (using 2\u03C3 rule): ", sum(abs(resids) > 2 * stats::sd(resids)), 
+              ",  Outliers (3\u03C3 rule): ",  sum(abs(resids) > 3 * stats::sd(resids)),"\n", sep = ""))
+    
+    
     if (plotOption == T){
       dEst <- stats::density(resids)
       graphics::hist(resids, col = "lightblue", xlab =  xLabName, freq = FALSE, 
@@ -140,8 +150,6 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
       graphics::lines(dEst, lwd = 3, col = "red", lty = 1)
       
     }
-    
-    output$resids <- residSummary
   } else {
     if (plotOption == T){
       graphics::barplot(reserve[c(2,1,3)], ylim = c(0, 1.1 * max(reserve[c(2,1,3)])), 
@@ -161,6 +169,4 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
       }
     }
   }
-  
-  return(output)
 }

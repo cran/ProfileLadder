@@ -1,4 +1,4 @@
-#' Nevada General Insurance Company data 
+#' Nevada General Insurance Company Data 
 #'
 #' An illustrative dataset---a matrix (of the dimensions 10\code{x}10) with ten 
 #' completed years of claims payment developments of the Nevada General Insurance 

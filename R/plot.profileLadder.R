@@ -1,4 +1,4 @@
-#' Plotting development profiles 
+#' Plotting Development Profiles 
 #'
 #' The function provides a graphical representation of the completed functional 
 #' profiles estimated by the PARALLAX, REACT, or MACRAME algorithm (see Maciak, 

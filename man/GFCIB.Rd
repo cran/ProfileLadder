@@ -3,7 +3,7 @@
 \docType{data}
 \name{GFCIB}
 \alias{GFCIB}
-\title{Guarantee Fund of the Czech Insurers' Bureau data}
+\title{Guarantee Fund of the Czech Insurers' Bureau Data}
 \format{
 \subsection{GFCIB}{
 

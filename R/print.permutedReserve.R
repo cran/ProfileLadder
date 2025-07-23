@@ -1,4 +1,4 @@
-#' Print objects of the S3 class \code{permutedReserve}
+#' Print Objects of the S3 Class \code{permutedReserve}
 #'
 #' Function to organize and print the output provided by the permutation bootstrap
 #' method implemented in the function  \code{permuteReserve()} 

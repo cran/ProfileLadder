@@ -1,4 +1,4 @@
-#' Plotting the output of the permutation bootstrap
+#' Plotting the Output of the Permutation Bootstrap
 #'
 #' The function provides a graphical visualization of the results obtained from 
 #' the permutation bootstrap (see Maciak, Mizera, and Pesta (2022) for further 

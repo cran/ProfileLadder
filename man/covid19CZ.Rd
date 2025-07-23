@@ -3,7 +3,7 @@
 \docType{data}
 \name{covid19CZ}
 \alias{covid19CZ}
-\title{First cases of Covid-19 in the Czech Republic}
+\title{First Occurrences of Covid-19 Cases in the Czech Republic}
 \format{
 \subsection{covid19CZ}{
 

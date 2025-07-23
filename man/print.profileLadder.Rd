@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.profileLadder.R
 \name{print.profileLadder}
 \alias{print.profileLadder}
-\title{Print objects of the S3 class \code{profileLadder}}
+\title{Print Objects of the S3 Class \code{profileLadder}}
 \usage{
 \method{print}{profileLadder}(x, ...)
 }

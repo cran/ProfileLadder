@@ -1,4 +1,4 @@
-#' Observed run-off triangle layout vs. predicted (unknown) layout
+#' Observed Run-Off Triangle Layout vs. Predicted (Unknown) Layout
 #'
 #' Simple layout function to make work with (cumulative or incremental) run-off 
 #' triangles more easy and straightforward.   
@@ -45,12 +45,12 @@ observed <- function(object, cum = TRUE){
     layout[row(layout) + col(layout) > object + 1] <- FALSE
     return(layout)
   } else {
-    if (any(class(object) == "profileLadder")){
+    if (inherits(object, "profileLadder")){
       chainLadder <- object$inputTriangle
       chainLadder[row(chainLadder) + col(chainLadder) > nrow(chainLadder) + 1] <- NA
       return(as.profileLadder(chainLadder))
     } else {
-      if (!any(class(object) %in% c("triangle", "matrix"))){
+      if (!inherits(object, c("triangle", "matrix"))){
         stop("Incorrect input value of 'object' provided")}
       if (dim(object)[1] != dim(object)[2]){
         stop("The dimensions of the imput object do not correspond.")}

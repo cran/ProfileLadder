@@ -2,7 +2,7 @@
 % Please edit documentation in R/as.profileLadder.R
 \name{as.profileLadder}
 \alias{as.profileLadder}
-\title{S3 Method class \code{profileLadder}}
+\title{S3 Method Class \code{profileLadder}}
 \usage{
 as.profileLadder(x)
 }
@@ -27,7 +27,7 @@ estimation algorithm (i.e., PARALLAX, REACT, or MACRAME)---if applied---value
 \description{
 A function to make the work with the functional development profiles within
 run-off triangles more easy and straightforward (particularly when vizualizing
-the functional profiles in a plot)
+the functional profiles---observed, completed, or both---in a plot)
 }
 \examples{
 data(CameronMutual)

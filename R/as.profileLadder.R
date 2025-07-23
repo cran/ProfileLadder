@@ -1,8 +1,8 @@
-#' S3 Method class \code{profileLadder}
+#' S3 Method Class \code{profileLadder}
 #'
 #' A function to make the work with the functional development profiles within 
 #' run-off triangles more easy and straightforward (particularly when vizualizing 
-#' the functional profiles in a plot)
+#' the functional profiles---observed, completed, or both---in a plot)
 #'
 #' @param x an object of the class \code{matrix} or \code{triangle}
 #' 
@@ -35,7 +35,7 @@
 #' @rdname as.profileLadder
 #' @export
 as.profileLadder <- function(x){
-  if (any(class(x) == "triangle") | any(class(x) == "matrix")){### matrix/triangle
+  if (inherits(x, "triangle") || inherits(x, "matrix")){### matrix/triangle
     if (dim(x)[1] != dim(x)[2]){stop("The object 'x' dimensions do not correspond")}
     
     n <- nrow(x) ### number of occurrence/development years
@@ -64,10 +64,10 @@ as.profileLadder <- function(x){
     }
     output$residuals <- NULL 
     
-    class(output) <- c('list', 'profileLadder')
+    class(output) <- c('profileLadder', 'list')
     return(output)
   } else {
-    if (all(class(x) != "profileLadder")){stop("The object 'x' is not compatible with the 'profileLadder' class")}
+    if (!inherits(x, "profileLadder")){stop("The object 'x' is not compatible with the 'profileLadder' class")}
    return(x)
   }
 }

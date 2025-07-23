@@ -1,4 +1,4 @@
-#' MACRAME based development profile reserve 
+#' MACRAME Based Development Profile Reserve 
 #'
 #' The function takes a cumulative (or incremental) run-off triangle (partially 
 #' or completely observed) and returns the reserve estimate obtained by the 
@@ -48,10 +48,6 @@
 #' \code{k} bins---in such cases, the parameter \code{states} should be of the 
 #' length \code{length(states) = k + 1}. Each value in \code{states} should 
 #' represent one bin defined by \code{breaks}
-#' @param MC logical (by DEFAULT set to \code{FALSE}) to indicate whether some 
-#' backgrpound information about the underlying Markov chain process 
-#' (e.g., Markov chain states or the estimated transition probability matrix) 
-#' should be printed in the output or not
 #' 
 #' @returns An object of the type \code{list} with with the following elements: 
 #' \item{reserve}{numeric vector with four values: Total paid amount (i.e., the 
@@ -77,7 +73,7 @@
 #' is not available) or the residuals are given in the lower-right triangle (i,e., 
 #' standard incremental residuals---if the true completed triangle is given)}
 #' 
-#' @seealso [incrExplor()], [permuteReserve()]
+#' @seealso [incrExplor()], [permuteReserve()], [mcBreaks()], [mcStates()], [mcTrans()]
 #' 
 #' @examples
 #' ## run-off (upper-left) triangle with NA values
@@ -85,28 +81,31 @@
 #' data(MW2014, package = "ChainLadder")
 #' print(MW2014) 
 #' 
-#' ## MACRAME prediction  with (DEFAULT) Markov chain setting 
-#' ## provided in the output
-#' mcReserve(MW2014, residuals = TRUE, MC = TRUE)}
+#' ## MACRAME reserve prediction with the DEFAULT Markov chain setting 
+#' mcReserve(MW2014, residuals = TRUE)}
 #' 
-#' ## completed run-off triangle with 'unknown' truth (lower-bottom run-off triangle)  
-#' ## with incremental residuals (true increments minus predicted ones) being provided 
+#' ## complete run-off triangle with 'unknown' truth (lower-bottom run-off triangle)  
+#' ## with incremental residuals (true increments minus predicted ones)  
 #' data(CameronMutual)
 #' mcReserve(CameronMutual, residuals = TRUE)
 #' 
-#' ## the same output in terms of the reserve estimate but back-fitted residuals 
-#' ## are provided instead (as the run-off triangle is provided only)
+#' ## the same output in terms of the reserve prediction but back-fitted residuals 
+#' ## are provided instead (as the run-off triangle only is provided)
 #' data(observed(CameronMutual))
 #' mcReserve(observed(CameronMutual), residuals = TRUE)
+#' 
+#' ## MACRAME reserve prediction with the underlying Markov chain with five 
+#' ## explicit Markov chain states
+#' mcReserve(CameronMutual, residuals = TRUE, states = c(200, 600, 1000))
 #' 
 #' @references Maciak, M., Mizera, I., and Pešta, M. (2022). Functional Profile 
 #' Techniques for Claims Reserving. ASTIN Bulletin, 52(2), 449-482. DOI:10.1017/asb.2022.4
 #' 
 #' @export
-mcReserve <- function(chainLadder, cum = TRUE, residuals = FALSE, states = NULL, 
-                                   breaks = NULL, MC = FALSE){
+mcReserve <- function(chainLadder, cum = TRUE, residuals = FALSE, 
+                                   states = NULL, breaks = NULL){
   ### input data checks
-  if (!any(class(chainLadder) %in% c("triangle", "matrix"))){
+  if (!(inherits(chainLadder, "triangle") || inherits(chainLadder, "matrix"))){
     stop("The input data must be of class 'triangle' or 'matrix'.")}
   if (dim(chainLadder)[1] != dim(chainLadder)[2]){
     stop("The input data do not form a run-off triangle (square matrix).")}
@@ -277,13 +276,11 @@ mcReserve <- function(chainLadder, cum = TRUE, residuals = FALSE, states = NULL,
   ### overall predicted reserve 
   reserve <- sum(completed[,n]) - sum(completed[last])
   
-  ### OUTPUT for the Markov chain
-  if (MC == T){
-    MarkovChain <- list()
-    MarkovChain$states <-states
-    MarkovChain$breaks <- yGrid
-    MarkovChain$transitionMatrix <- round(P, 4)
-  } 
+  ### OUTPUT for the Markov chain setup
+  MarkovChain <- list()
+  MarkovChain$states <-states
+  MarkovChain$breaks <- yGrid
+  MarkovChain$transitionMatrix <- round(P, 4)
   
   
   ### backfitting for residuals
@@ -401,8 +398,9 @@ mcReserve <- function(chainLadder, cum = TRUE, residuals = FALSE, states = NULL,
     output$trueComplete <-  ChainLadder::as.triangle(chainLadder)
   }
   if (residuals == TRUE){output$residuals <- resids} else {output$residuals <- NULL}
-  if (MC == TRUE){output$MarkovChain <- MarkovChain} else {output$MarkovChain <- NULL}
   
-  class(output) <- c('list', 'profileLadder')
+  output$MarkovChain <- MarkovChain
+  
+  class(output) <- c('profileLadder', 'list')
   return(output)
 } ### end of MACRAME function

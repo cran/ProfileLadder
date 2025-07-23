@@ -1,4 +1,4 @@
-#' Midwest Family Mutual Insurance Company data 
+#' Midwest Family Mutual Insurance Company Data 
 #'
 #' An illustrative dataset---a matrix (of the dimensions 10\code{x}10) with ten 
 #' completed years of claims payment developments of the Midwest Family Mutual 

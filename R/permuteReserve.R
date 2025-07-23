@@ -1,4 +1,4 @@
-#' Permutation bootstrap reserve (PARALLAX, REACT, MACRAME)
+#' Permutation Bootstrap Reserve (PARALLAX, REACT, MACRAME)
 #'
 #' The function takes the output from the function \code{parallelReserve()} or 
 #' \code{mcReserve} and estimates the overall reserve distribution in terms of the 
@@ -30,7 +30,7 @@
 #' permutation bootstrap reserves; The value of \code{BootCov\%} stands for  
 #' a percentage proportion between the standard error and the average; 
 #' Finally, \code{BootVar.995} provides the estimated 0.995 quantile (by DEFAULT)
-#' of the boostrap reserve distribution (for \code{quantile = 0.995} and, otherwise, 
+#' of the bootstrap reserve distribution (for \code{quantile = 0.995} and, otherwise, 
 #' it is modified acordingly) given relatively with respect to the permutation 
 #' bootstrapped mean reserve}
 #' \item{pReserves}{a numeric vector of the length \code{B} with the estimated 
@@ -41,7 +41,13 @@
 #' ultimate payments -- the last column in the completed run-off triangle}
 #' \item{pLatest}{A matrix of the dimensions \code{B x n} (where \code{n} again
 #' stands for the number of the origin/development periods) with \code{B} simulated 
+#' incremental diagonals}
+#' \item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the 
+#' number of the origin/development periods) with \code{B} simulated cumulative
 #' diagonals}
+#' \item{inputTriangle}{The input run-off triangle}
+#' \item{completed}{The completed run-off triangle by using one of the PARALLAX, 
+#' REACT, or MACRAME estimation method}
 #' \item{trueComplete}{The true complete run-off triangle (if available) and \code{NA}
 #' value otherwise}
 #' \item{info}{a numeric vector summarizing the bootstrap compuational efficiency: 
@@ -73,19 +79,19 @@
 #' @export
 permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   ### input data checks
-  if (all(class(object) != "profileLadder")){
+  if (!inherits(object, "profileLadder")){
     stop("The input object must be of a class 'profileLadder'")}
-  if (any(class(object) == "profileLadder") & all(is.na(object$completed))){
+  if (inherits(object, "profileLadder") && all(is.na(object$completed))){
     stop("The input object must be a result of 'parallelReserve()' or 'mcReserve()'")}
-  if (!is.numeric(B) | length(B) > 1){
+  if (!is.numeric(B) || length(B) > 1){
     stop("The number of bootstrap permutations 'B' must be a numeric (integer) value")}
-  if (round(B, 0) != B | B <= 0){
+  if (round(B, 0) != B || B <= 0){
     stop("The number of boostrap permutations 'B' must be a positive integer value")} 
   if (B < 30){
     warning("The number of bootstrap permutations 'B' is too low")} 
-  if (!is.numeric(quantile) | length(quantile) > 1){
+  if (!is.numeric(quantile) || length(quantile) > 1){
     stop("The quantile value must be a single value in interval (0,1)")}
-  if (quantile >= 1 | quantile <= 0){
+  if (quantile >= 1 || quantile <= 0){
     stop("The quantile value must be in interval (0,1)")}
   
   ### reserve summary
@@ -149,7 +155,11 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   ultimates <- data.frame(t(pReserve[1:n,]))
   names(ultimates) <- paste("origin", 1:n, sep = " ")
   
-  ### bootstrapped latest
+  ### bootstrapped latest (cummulative)
+  latestCum <- data.frame(t(pReserve[(n + 1):(2 * n),]))
+  names(latestCum) <- paste("origin", 1:n, sep = " ")
+  
+  ### bootstrapped latest (incremental)
   latest <- data.frame(t(pReserve[(2 * n + 1):(3 * n),]))
   names(latest) <- paste("origin", 1:n, sep = " ")
   
@@ -162,8 +172,8 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   estimatedReserve <- c(sum(inputTriangle[last]), sum(object$completed[,n]), 
                         sum(object$completed[,n]) - sum(object$inputTriangle[last]), 
                         reserve[4])
-  names(estimatedReserve) <- c("Paid Amount", "   Estimated Ultimate", 
-                               "   Estimated Reserve", "   True Reserve")
+  names(estimatedReserve) <- c("Paid Amount", "   Est.Ultimate", 
+                               "   Est.Reserve", "   True Reserve")
   
   BootCoV <- 100 * stats::sd(reserves)/mean(reserves)
   BootVar995 <- stats::quantile(reserves, quantile)/mean(reserves)
@@ -183,6 +193,7 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   output$pReserves <- as.numeric(reserves)
   output$pUltimates <- ultimates
   output$pLatest <- latest
+  output$pLatestCum <- latestCum
   
   if (all(!is.na(trueComplete))){
     output$tUltimate <- trueComplete[,n]
@@ -190,7 +201,9 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
     output$tUltimate <- NA
   }
   output$tLatest <- rev(ChainLadder::cum2incr(inputTriangle)[last])
-
+  
+  output$inputTriangle <- inputTriangle
+  output$completed <- object$completed
   output$trueComplete <- trueComplete
   
   time <- c(Sys.info()["sysname"], Sys.info()["machine"], paste("B = ", round(B,0), sep = ""), paste("n = ", n, sep = ""), 
@@ -198,7 +211,7 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   names(time) <- c("OS System", "Architecture", "Permutation number", "   Triangle dimension", "   Run time")
   output$info <- time
   
-  class(output) <- c('list', 'permutedReserve')
+  class(output) <- c('permutedReserve', 'list')
   return(output)
 } ### end of permuteReserve() function
 

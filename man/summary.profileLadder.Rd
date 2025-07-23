@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.profileLadder.R
 \name{summary.profileLadder}
 \alias{summary.profileLadder}
-\title{Summary method for an object of the S3 class method \code{profileLadder}}
+\title{Summary Method for Objects of the S3 Class Method \code{profileLadder}}
 \usage{
 \method{summary}{profileLadder}(object, plotOption = FALSE, ...)
 }

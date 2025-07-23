@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.permutedReserve.R
 \name{print.permutedReserve}
 \alias{print.permutedReserve}
-\title{Print objects of the S3 class \code{permutedReserve}}
+\title{Print Objects of the S3 Class \code{permutedReserve}}
 \usage{
 \method{print}{permutedReserve}(x, ...)
 }

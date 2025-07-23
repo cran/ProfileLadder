@@ -2,7 +2,7 @@
 % Please edit documentation in R/permuteReserve.R
 \name{permuteReserve}
 \alias{permuteReserve}
-\title{Permutation bootstrap reserve (PARALLAX, REACT, MACRAME)}
+\title{Permutation Bootstrap Reserve (PARALLAX, REACT, MACRAME)}
 \usage{
 permuteReserve(object, B = 500, std = TRUE, quantile = 0.995)
 }
@@ -37,7 +37,7 @@ reserves; \code{Std.Er.} provides the corresponding standard error of \code{B}
 permutation bootstrap reserves; The value of \code{BootCov\%} stands for
 a percentage proportion between the standard error and the average;
 Finally, \code{BootVar.995} provides the estimated 0.995 quantile (by DEFAULT)
-of the boostrap reserve distribution (for \code{quantile = 0.995} and, otherwise,
+of the bootstrap reserve distribution (for \code{quantile = 0.995} and, otherwise,
 it is modified acordingly) given relatively with respect to the permutation
 bootstrapped mean reserve}
 \item{pReserves}{a numeric vector of the length \code{B} with the estimated
@@ -48,7 +48,13 @@ stands for the number of the origin/development periods) with \code{B} simulated
 ultimate payments -- the last column in the completed run-off triangle}
 \item{pLatest}{A matrix of the dimensions \code{B x n} (where \code{n} again
 stands for the number of the origin/development periods) with \code{B} simulated
+incremental diagonals}
+\item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the
+number of the origin/development periods) with \code{B} simulated cumulative
 diagonals}
+\item{inputTriangle}{The input run-off triangle}
+\item{completed}{The completed run-off triangle by using one of the PARALLAX,
+REACT, or MACRAME estimation method}
 \item{trueComplete}{The true complete run-off triangle (if available) and \code{NA}
 value otherwise}
 \item{info}{a numeric vector summarizing the bootstrap compuational efficiency:

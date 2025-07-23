@@ -1,4 +1,4 @@
-#' Guarantee Fund of the Czech Insurers' Bureau data 
+#' Guarantee Fund of the Czech Insurers' Bureau Data 
 #'
 #' Illustrative datasets provided by the  Guarantee Fund of the Czech Insurers' 
 #' Bureau (GFCIB) for the mandatory car insurance in the Czech Republic. 

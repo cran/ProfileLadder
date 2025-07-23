@@ -1,4 +1,4 @@
-#' Print objects of the S3 class \code{profileLadder}
+#' Print Objects of the S3 Class \code{profileLadder}
 #'
 #' Function to organize and print the outputs provided by the function 
 #' \code{parallelReserve()} and the function \code{mcReserve}

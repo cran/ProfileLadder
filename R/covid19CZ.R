@@ -1,4 +1,4 @@
-#' First cases of Covid-19 in the Czech Republic 
+#' First Occurrences of Covid-19 Cases in the Czech Republic 
 #'
 #' An illustrative dataset---a matrix (of the dimensions 4\code{x}8) with the 
 #' cumulative counts of the first reported cases of the Covid-19 pandemic 

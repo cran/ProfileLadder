@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.profileLadder.R
 \name{plot.profileLadder}
 \alias{plot.profileLadder}
-\title{Plotting development profiles}
+\title{Plotting Development Profiles}
 \usage{
 \method{plot}{profileLadder}(x, xlab = "Development Year", ylab = "Cumulative Claims", main = "", ...)
 }

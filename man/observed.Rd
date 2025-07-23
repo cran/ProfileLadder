@@ -2,7 +2,7 @@
 % Please edit documentation in R/observed.R
 \name{observed}
 \alias{observed}
-\title{Observed run-off triangle layout vs. predicted (unknown) layout}
+\title{Observed Run-Off Triangle Layout vs. Predicted (Unknown) Layout}
 \usage{
 observed(object, cum = TRUE)
 }

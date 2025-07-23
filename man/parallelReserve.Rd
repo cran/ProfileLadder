@@ -2,7 +2,7 @@
 % Please edit documentation in R/parallelReserve.R
 \name{parallelReserve}
 \alias{parallelReserve}
-\title{Parallel based development profile reserve}
+\title{Parallel Based Development Profile Reserve}
 \usage{
 parallelReserve(
   chainLadder,

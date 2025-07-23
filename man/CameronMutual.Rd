@@ -3,7 +3,7 @@
 \docType{data}
 \name{CameronMutual}
 \alias{CameronMutual}
-\title{Cameron Mutual Insurance Company data}
+\title{Cameron Mutual Insurance Company Data}
 \format{
 \subsection{CameronMutual}{
 

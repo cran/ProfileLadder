@@ -1,4 +1,4 @@
-#' Parallel based development profile reserve 
+#' Parallel Based Development Profile Reserve 
 #'
 #' The function takes a cumulative (or incremental) run-off triangle (partially 
 #' or completely observed) and returns the reserve estimate obtained by the 
@@ -79,7 +79,7 @@ parallelReserve <- function(chainLadder, method = "parallax", cum = TRUE, residu
   ### input data checks
   if (method != "parallax" & method != "react"){
     stop("Not a correct prediction method = c('parallel', 'react') selected.")}
-  if (!any(class(chainLadder) %in% c("triangle", "matrix"))){
+  if (!inherits(chainLadder, c("triangle", "matrix"))){
     stop("The input data must be of class 'triangle' or 'matrix'.")}
   if (dim(chainLadder)[1] != dim(chainLadder)[2]){
     stop("The input data do not form a run-off triangle (square matrix).")}
@@ -222,6 +222,6 @@ parallelReserve <- function(chainLadder, method = "parallax", cum = TRUE, residu
   }
   if (residuals == TRUE){output$residuals <- resids} else {output$residuals <- NULL}
   
-  class(output) <- c('list', 'profileLadder')
+  class(output) <- c('profileLadder', 'list')
   return(output)
 } ### end of parallelReserve function

@@ -1,4 +1,4 @@
-#' Exploratory function for run-off triange increments
+#' Exploratory Function for Run-Off Triangle Increments
 #'
 #' The function takes a cumulative or incremental run-off triangle (partially or 
 #' completely observed) and provides some basic exploratory and graphical 
@@ -38,21 +38,16 @@
 #' (i.e., numeric vectors are provided for both) then the set of states in 
 #' \code{states} must be given in a way that exactly one state value belongs to 
 #' exactly one bin defined by the break points specified by \code{breaks}
-#' @param plotOption logical to indicate whether a graphical output supplementing 
-#' the empirical exploratory should be provided (\code{TRUE}) 
-#' or not (\code{FALSE} -- DEFAULT) 
-#' @param plotScale positive scaling factor for adjusting the overall graphical 
-#' output (the DEFAULT value is \code{plotScale = 1})
 #' 
-#' @returns A list with the following elements:
+#' @returns An object of the class \code{mcSetup} with the following elements:
 #' \item{incrTriangle}{an object of the class \code{triangle} with the incremental 
 #' run-off triangle}
 #' \item{triangleType}{type of the input run-off triangle provided for the input 
 #' object \code{triangle} (cumulative or incremental)}
-#' \item{defaultStates}{the set of explicit states as used (by DEFAULT) by the 
-#' \code{mcReserve()} estimation algorithm}
-#' \item{defaultBreaks}{the set of explicit breaks as used (by DEFAULT) by the 
-#' \code{mcReserve()} estimation algorithm}
+#' \item{defaultStates}{the data-driven set of explicit states as used (by DEFAULT) 
+#' by the \code{mcReserve()} function -- the MACRAME prediction algorithm}
+#' \item{defaultBreaks}{the set of explicit data-driven breaks as used (by DEFAULT) 
+#' by the \code{mcReserve()} function -- the MACRAME prediction algorithm}
 #' \item{increments}{table with basic empirical characteristics of the increments 
 #' of the input run-off triangle (without the first origin payments---the values 
 #' in the first column of the run-off triangle). Two sets of increments are provided: 
@@ -97,10 +92,9 @@
 #' 
 #' @export
 incrExplor <- function(triangle, method = c("median", "mean", "max", "min"), 
-                                 out = 1, states = NULL, breaks = NULL, 
-                                 plotOption = FALSE, plotScale = 1){
+                                 out = 1, states = NULL, breaks = NULL){
   ### input data checks
-  if (!any(class(triangle) %in% c("triangle", "matrix"))){
+  if (!(inherits(triangle, "triangle") || inherits(triangle, "matrix"))){
     stop("The input data must be of class 'triangle' or 'matrix'.")}
   if (dim(triangle)[1] != dim(triangle)[2]){
     stop("The input data do not form a run-off triangle (square matrix).")}
@@ -179,9 +173,11 @@ incrExplor <- function(triangle, method = c("median", "mean", "max", "min"),
     incrTriangle1CU <- incrTriangle
   }
   
-  if (all(method == c("median", "mean", "max","min")) & 
-          length(out) == 1 & out[1] == 1 & 
-          is.null(states) & is.null(breaks)){userInput <- FALSE}
+  if ((all(method == c("median", "mean", "max","min")) | method[1] == "median") & 
+          length(out) == 1 & out[1] == 1 & is.null(states) & is.null(breaks)){
+    userInput <- FALSE
+    setup <- 0
+  }
   else {### USER defined modifications
     userInput <- TRUE
     if (is.null(states) & is.null(breaks)){### out is modified 
@@ -279,184 +275,36 @@ incrExplor <- function(triangle, method = c("median", "mean", "max", "min"),
     statesU <- statesU[!is.na(statesU)]
   }
   
-  ### plotting the results 
-  if (plotOption == TRUE){
-    ### OS system specification
-    sys_info <- Sys.info()
-    if (sys_info["sysname"] == "Windows") {
-      #grDevices::windows(width = 20, height = 15) ## windows() for Windows OS
-      scaleFac <- 0.65 * plotScale
-    } else if (sys_info["sysname"] == "Darwin") {
-      #grDevices::quartz(width = 12, height = 8)   ## quartz() for macOS
-      scaleFac <- 0.75 * plotScale
-    } else {
-      #grDevices::x11(width = 15, height = 10)     ## x11() for Linux or other OS
-      scaleFac <- 0.68 * plotScale
-    }
-    
-    ###  graphical window setting and reset on exit
-    old_par <- graphics::par(no.readonly = TRUE)
-    on.exit(graphics::par(old_par))
-    ###
-    
-    graphics::par(mfrow = c(2,2), mar = c(5, 3, 5, 3), cex = scaleFac)
-    
-    ### plot 1
-    graphics::hist(incrs, breaks = n, col = "lightblue", freq = FALSE,
-                   xlab = "Run-off triangle increments", 
-                   main = "(I) Histogram: Incremental triangle[ , -1]", 
-                   xlim = c(min(incrs), max(incrs)))
-    graphics::lines(stats::density(incrs), col = "red", lwd = 2)
-    
-    ### plot 2
-    plot(0,0, pch = "", xaxt='n', yaxt='n', frame.plot = FALSE, xlab = "", ylab = "", 
-              xlim = c(0,1), ylim = c(0,1), 
-              main = "(II) Summary: Incremental triangle[,-1]")
-    ### basic characteristics
-    graphics::text(-0.05,0.97, "Run-off increments summary", 
-                   font = 2, pos = 4, cex = scaleFac * 1.4)
-      statValues <- c(round(as.numeric(summary(incrs))), 
-                      round(stats::sd(incrs)), length(incrs))
-      valuesNames <- c("Min", "1st Q.", "Median", "Mean", 
-                       "3rd Q.", "Max", "Std.Er.", "Total")
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.94,7), labels = valuesNames, 
-                     col = "darkblue", cex = scaleFac * 1.1, pos = 1, font = 2)
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.89,7), labels = statValues, 
-                     col = "black", cex = scaleFac * 1, pos = 1, )
-      graphics::lines(c(0.5, 0.9), c(0.79, 0.79), col = "darkred")
-    ### first increments  characteristics
-    graphics::text(-0.05,0.75, "First year (origin) increments", 
-                   font = 2, pos = 4, cex = scaleFac * 1.4)
-      statValues <- c(round(as.numeric(summary(triangle[,1]))), 
-                      round(stats::sd(triangle[,1])), n)
-      valuesNames <- c("Min", "1st Q.", "Median", "Mean", 
-                       "3rd Q.", "Max", "Std.Er.", "Total")
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.72,7), labels = valuesNames, 
-                     col = "darkblue", cex = scaleFac * 1.1, pos = 1, font = 2)
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.67,7), labels = statValues, 
-                     col = "black", cex = scaleFac * 1, pos = 1, )
-      graphics::lines(c(0.5, 0.9), c(0.57, 0.57), col = "darkred")
-    ### First year stability
-    graphics::text(-0.05,0.53, "First year stability (trend)", 
-                   font = 2, pos = 4, cex = scaleFac * 1.4)
-      m <- summary(stats::lm(triangle[,1] ~ seq(1,n, length = n)))
-      statValues <- c(format(round(m$coeff[2,1], 2), nsmall = 2), 
-                      format(round(m$coeff[2,2], 2), nsmall = 2), 
-                      format(round(m$coeff[2,4], 4), nsmall = 4))
-      valuesNames <- c("Regression trend/slope", "Std.Er.", "Significance")
-      graphics::text(c(0.47,0.705, 0.86), rep(0.50,7), labels = valuesNames, 
-                     col = "darkblue", cex = scaleFac * 1.1, pos = 1, font = 2)
-      graphics::text(c(0.47,0.705, 0.86), rep(0.45,7), labels = statValues, 
-                     col = "black", cex = scaleFac * 1, pos = 1)
-      graphics::lines(c(0.5, 0.9), c(0.35, 0.35), col = "darkred")
-    ### input information 
-    graphics::text(-0.05,0.27, "Input triangle summary", 
-                   font = 2, pos = 4, cex = scaleFac * 1.4)
-    graphics::text(-0.05, 0.21, paste(triangleType, " triangle | Origin/development periods: ", 
-                                      n, "x", n, " | Total paid amount: ", paidAmount, sep = ""), 
-                   col = "darkblue", cex = scaleFac * 1, pos = 4, font = 2)
-    ### USER defined increments summary 
-    if (userInput == T & sum(out) != 1){  
-      graphics::text(-0.05,0.12, paste("USER selected increments [columns out = c(", 
-                                       paste(as.character(out), collapse = ","), ")]", sep = ""), 
-                     font = 2, pos = 4, cex = scaleFac * 1.2, col = "darkred")
-      statValues <- c(round(as.numeric(summary(incrsU))), 
-                      round(stats::sd(incrsU)), length(incrsU))
-      valuesNames <- c("Min", "1st Q.", "Median", "Mean", 
-                       "3rd Q.", "Max", "Std.Er.", "Total")
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.10,7), labels = valuesNames, 
-                     col = "darkblue", cex = scaleFac * 1.1, pos = 1, font = 2)
-      graphics::text(seq(0.35, 0.9, length = 8), rep(0.04,7), labels = statValues, 
-                     col = "black", cex = scaleFac * 1, pos = 1, )
-    }
-      
-    ### plot 3
-    plotLabels <- names(table(cut(incrs, breaks=defaultBreaks, right = FALSE, dig.lab = 6)))
-    tableNum <- table(cut(incrs, breaks=defaultBreaks, right = FALSE, dig.lab = 6))
-    names(tableNum) <- 1:length(tableNum)
-    defaultPlot <- graphics::barplot(tableNum, xaxt='n', 
-                                     xlab = paste("Run-off triangle increments (", 
-                                                  length(defaultStates), " disjoint bins)", sep = ""), 
-                                     ylab = "Frequency of increments",
-                                     main = "(III) DEFAULT bins/breaks for increments and MC states")
-    graphics::axis(side=1,at=defaultPlot[2 * 1:ceiling(length(plotLabels)/2) - 1], 
-                   labels = plotLabels[2 * 1:ceiling(length(plotLabels)/2) - 1], cex =  0.6)
-    graphics::text(defaultPlot, rep(max(tableNum/5),n), labels = "MC state\n value", 
-                   col = "darkred", cex = scaleFac * 0.9, pos = 1)
-    graphics::text(defaultPlot, rep(max(tableNum/10),n), labels = round(defaultStates, 0), 
-                   col = "darkblue", cex = scaleFac * 1.4, pos = 1, font = 2)
-    
-    ### plot 4
-    if (userInput == T){
-      plotLabelsU <- names(table(cut(incrsU, breaks=yGridU, right = FALSE, dig.lab = 6)))
-      tableNumU <- table(cut(incrsU, breaks=yGridU, right = FALSE, dig.lab = 6))
-      names(tableNumU) <- 1:length(tableNumU)
-      
-      userPlot <- graphics::barplot(tableNumU, xaxt='n', 
-                                    xlab = paste("Run-off triangle increments (", 
-                                                 length(statesU), " disjoint bins)", sep = ""), 
-                                    ylab = "Frequency of increments",
-                                    main = "(IV) USER based: method/out/states/breaks")
-      graphics::axis(side=1,at=userPlot[2 * 1:ceiling(length(plotLabelsU)/2) - 1], 
-                     labels = plotLabelsU[2 * 1:ceiling(length(plotLabelsU)/2) - 1], cex = 0.6)
-      graphics::text(userPlot, rep(max(tableNumU/5),n), labels = "MC state\n value", 
-                     col = "darkred", cex = scaleFac * 0.9, pos = 1)
-      graphics::text(userPlot, rep(max(tableNumU/10),n), labels = round(statesU, 0), 
-                     col = "darkblue", cex = scaleFac * 1.4, pos = 1, font = 2)
-    } else {
-      plot(0,0, pch = "", xaxt='n', yaxt='n', frame.plot = F, xlab = "", ylab = "", 
-                xlim = c(0,1), ylim = c(0,1), 
-                main = "(IV) USER based: method/out/states/breaks")
-      graphics::text(-0.05, 0.8, "No USER specified modifications.", 
-                     pos = 4, font = 2, cex = scaleFac * 1.2)
-      graphics::text(-0.05, 0.75, "(DEFAULT output proposed in Maciak, Mizera and Pesta (2022) is only provided).", 
-                                  pos = 4, font = 1, cex = scaleFac * 1, col = "darkred")
-      
-      graphics::text(-0.05, 0.5,  "For any USER modified exploration of the incremental payments in the given run-off triangle,", pos = 4, font = 1, cex = scaleFac * 1)
-      graphics::text(-0.05, 0.43, "different settings can be specified by the additional parameters. Firstly, a different set of", pos = 4, font = 1, cex = scaleFac * 1)
-      graphics::text(-0.05, 0.36, "increments (in columns) can be considered; Second, the increments within each bin can be", pos = 4, font = 1, cex = scaleFac * 1)
-      graphics::text(-0.05, 0.29, "summarized by a different statistical method; Third, explicit Markov chain states can be used;", pos = 4, font = 1, cex = scaleFac * 1)
-      graphics::text(-0.05, 0.22, "Finally, explicit break points to define bins can be enforced. The following parameters can be used: ", pos = 4, font = 1, cex = scaleFac * 1)
-      graphics::text(-0.05, 0.15, " 'method' ,  'out' ,  'states' ,  'breaks' ", pos = 4, font = 2, cex = scaleFac * 0.95, col = "darkblue")
-      
-    }
-  }
-  
-  ### summary of increments for output
-  summaryExt <- function(x, d){return(c(round(summary(x),d), round(stats::sd(x), d), length(x)))}
-  increments <- rbind(summaryExt(incrs, 0), summaryExt(incrs/maxIncr, 4))
-  if (userInput == T){
-    increments <- rbind(increments, summaryExt(incrsU, 0), summaryExt(incrsU/maxIncrU, 4))
-    row.names(increments) <- c("DEFAULT raw", "DEFAULT std.", "USER raw", "USER std.")
-  } else {
-    row.names(increments) <- c("DEFAULT raw", "DEFAULT std.")
-  }
-  colnames(increments) <- c("Min", "1st Q.", "Median", "Mean", "3rd Q.", "Max", "Std.Er.", "Total")
-  
-  ## summary of user defined options for output
+  ## summary of user defined modifications for the output
   if (userInput == TRUE){
     userDefined <- list()
     userDefined$increments <- incrsU
     userDefined$outColumns <- out
-    if (any(method %in% c("median", "mean", "min", "max"))){
+    if (all(method == c("median", "mean", "min", "max")) | method[1] == "median"){
       userDefined$method <- "DEFAULT (median)"
     } else {
       userDefined$method <- method
     }
     userDefined$states <- statesU
     userDefined$breaks <- yGridU
+    userDefined$setup <- setup ### value 3 for explictely enforced set of states
   } else {
     userDefined <- NULL  
   }
   
-  ### OUTPUT 
+  ### Default Markov chain details
+  MarkovChain <- list()
+  MarkovChain$states <- defaultStates
+  MarkovChain$breaks <- defaultBreaks
+  MarkovChain$increments <- incrs
+  
+  ### OUTPUT (overall)
   output <- list()
   output$incrTriangle <- ChainLadder::as.triangle(incrTriangle)
   output$triangleType <- triangleType
-  output$defaultStates <- defaultStates
-  output$defaultBreaks <- defaultBreaks
-  output$increments <-increments
+  output$MarkovChain <- MarkovChain
   output$userDefined <- userDefined
   
+  class(output) <- c('mcSetup', 'list')
   return(output)
 }

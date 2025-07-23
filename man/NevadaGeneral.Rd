@@ -3,7 +3,7 @@
 \docType{data}
 \name{NevadaGeneral}
 \alias{NevadaGeneral}
-\title{Nevada General Insurance Company data}
+\title{Nevada General Insurance Company Data}
 \format{
 \subsection{NevadaGeneral}{
 
