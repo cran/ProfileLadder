@@ -1,34 +1,35 @@
 #' MACRAME Based Development Profile Reserve 
 #'
 #' The function takes a cumulative (or incremental) run-off triangle (partially 
-#' or completely observed) and returns the reserve estimate obtained by the 
+#' or completely observed) and returns the reserve prediction obtained by the 
 #' MACRAME algorithm (see Maciak, Mizera, and Pešta (2022) for further details).
 #'
 #' @param chainLadder a cumulative or incremental run-off triangle (the triangle 
 #' must be of the class \code{triangle} or \code{matrix}) in terms of a square 
 #' matrix with a fully observed upper-left triangular part. If the lower-right 
 #' part is also provided the function will also return standard residuals but 
-#' only the upper-left (run-off) triangle is be used for the reserve estimation 
+#' only the upper-left (run-off) triangle is be used for the reserve prediction 
 #' purposes
-#' @param cum logical to indicate the time of the input triangle provided 
+#' @param cum logical to indicate the type of the input triangle that is provided 
 #' (DEFAULT value is \code{TRUE} for the cumulative triangle, \code{FALSE} if 
 #' \code{chainLadder} is of the incremental type)
 #' @param residuals logical to indicate whether (incremental) residuals should 
 #' be provided in output or not. If the run-off triangle is completely observed 
 #' then the residuals are obtained in terms of the true increments minus the 
-#' predicted ones. If the bottom-right triangle is not provided (\code{NA} values) 
-#' then the residuals are obtained in terms of a back-fitting approach 
-#' (see Maciak, Mizera, and Pešta (2022) for further details). 
+#' predicted ones. If the bottom-right triangle is not available (which is a typical 
+#' situation in practice) then the residuals are obtained in terms of a back-fitting 
+#' approach (see Maciak, Mizera, and Pešta (2022) for further details). 
 #' However, the back-fitted residuals are only calculated when 
 #' no user specification of the states (in \code{states}) and breaks 
-#' (in \code{breaks}) is provided
+#' (in \code{breaks}) is provided (as it is usually not appropriate to use the same 
+#' states/breaks for the flipped run-off triangle)
 #' @param states numeric value to provide either the number of the Markov states 
-#' to be used or it can provide an explicit set of the states to be used. 
+#' to be used or it can specify an explicit set of the states instead. 
 #' The default setting (\code{states = NULL}) provides the set of states in a fully 
 #' data-driven manner as proposed in Maciak, Mizera, and Pešta (2022) while any 
 #' choice of  \code{breaks} is ignored. If the number of states is specified by 
 #' \code{states}, the states are obtained analogously as in Maciak, Mizera,
-#' and Pešta (2022), however, the number of actual  states for the estimation is 
+#' and Pešta (2022), however, the number of actual  states  is 
 #' adjusted and the parameter \code{breaks} is again ignored 
 #' 
 #' If parameter \code{states} provides an explicit vector of Markov chain states 
@@ -51,18 +52,18 @@
 #' 
 #' @returns An object of the type \code{list} with with the following elements: 
 #' \item{reserve}{numeric vector with four values: Total paid amount (i.e., the 
-#' sum of the last observed diagonal in a cumulative run-off triangle); Total 
-#' estimated amount (i.e., the sum of the last column in the completed cumulative 
+#' sum of the last observed diagonal in a cumulative run-off triangle); Estimated 
+#' ultimate (i.e., the sum of the last column in the completed cumulative run-off
 #' triangle); Estimated reserve (i.e., the sum of the last column in the completed 
 #' cumulative triangle minus the sum of the last observed diagonal 
 #' in \code{chainLadder}); True reserve if a completed \code{chainLadder} is 
-#' provided in the output (i.e., the sum of the last column in \code{chainLadder} 
+#' provided for the input (i.e., the sum of the last column in \code{chainLadder} 
 #' minus the sum of the last diagonal in \code{chainLadder})}
 #' \item{method}{algorithm used for the reserve estimation}
-#' \item{fullTriangle}{completed run-off triangle (the upper-left triangular part 
+#' \item{Triangle}{the input run-off triangle provided in \code{chainLadder}}
+#' \item{FullTriangle}{completed run-off triangle (the upper-left triangular part 
 #' is identical with the input triangle in \code{chainLadder} and the lower-right 
 #' trianglular part is completed by the MACRAME algorithm}
-#' \item{inputTriangle}{the input run-off triangle provided in \code{chainLadder}}
 #' \item{trueCompleted}{true completed triangle (if available) where the upper-left 
 #' part is used by the MACRAME algorithm to estimate the reserve and the lower-right 
 #' part is provided for some evaluation purposes. If the full triangle is not 
@@ -77,12 +78,11 @@
 #' 
 #' @examples
 #' ## run-off (upper-left) triangle with NA values
-#' if (requireNamespace("ChainLadder")) {
 #' data(MW2014, package = "ChainLadder")
 #' print(MW2014) 
 #' 
 #' ## MACRAME reserve prediction with the DEFAULT Markov chain setting 
-#' mcReserve(MW2014, residuals = TRUE)}
+#' mcReserve(MW2014, residuals = TRUE)
 #' 
 #' ## complete run-off triangle with 'unknown' truth (lower-bottom run-off triangle)  
 #' ## with incremental residuals (true increments minus predicted ones)  
@@ -390,8 +390,8 @@ mcReserve <- function(chainLadder, cum = TRUE, residuals = FALSE,
   output <- list()
   output$reserve <- reserveOutput
   output$method <- "MACRAME method (functional profile completion)"
-  output$completed <- ChainLadder::as.triangle(completed)
-  output$inputTriangle <- ChainLadder::as.triangle(inputTriangle)
+  output$Triangle <- ChainLadder::as.triangle(inputTriangle)
+  output$FullTriangle <- ChainLadder::as.triangle(completed)
   if (all(is.na(chainLadder[!observed(n)]))){
     output$trueComplete <- NA
   } else {

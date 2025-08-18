@@ -1,24 +1,30 @@
 #' Access Markov Chain Breaks for Run-Off Triangle Increments
 #'
-#' Retrieves the Markov chain components from the \code{profileLadder} object returned 
-#' from the function \code{mcReserve()} or the \code{mcSetup} object returned 
-#' from the function \code{incrExplor()}. In particular, the function returns 
+#' Retrieves the Markov chain components from the output of the \code{incrExplor()}
+#' function or the \code{mcReserve()} function. In particular, the function returns 
 #' the set of breaks used to define the bins for the incremental run-off triangle
 #' increments. 
 #'
-#' @param object An object of class \code{profileLadder}.
+#' @param object An object of the class \code{profileLadder} returned from the function 
+#' \code{mcReserve()} or an object of the class \code{mcSetup} returned from the 
+#' function \code{incrExplor()}.
 #' 
-#' @return The vector of the break points that define the set bins for the run-off 
+#' @return The vector of the break points that define the set of bins for the run-off 
 #' triangle increments. 
 #' 
-#' @seealso [mcReserve()], [mcStates()], [mcTrans()]
+#' @seealso [mcReserve()], [incrExplor()], [mcStates()], [mcTrans()]
 #' 
 #' @examples
-#' ## MACRAME reserve prediction with the DEFAULT Markov chain setup 
-#' output <- mcReserve(CameronMutual)
+#' ## DEFAULT performance of the incrExplor() function and the MACRAME algorithm
+#' output1 <- incrExplor(CameronMutual)
+#' output2 <- mcReserve(CameronMutual)
 #' 
-#' ## Extracting the corresponding break points
-#' mcBreaks(output)
+#' ## Extracting the DEFAULT break points from both outputs
+#' mcBreaks(output1)
+#' mcBreaks(output2)
+#' 
+#' ## Extracting the corresponding break points for 4 Markov states
+#' mcBreaks(incrExplor(CameronMutual, states = 4))
 #' 
 #' @export
 mcBreaks <- function(object) {

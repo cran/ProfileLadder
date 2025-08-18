@@ -4,12 +4,16 @@
 \alias{print.profileLadder}
 \title{Print Objects of the S3 Class \code{profileLadder}}
 \usage{
-\method{print}{profileLadder}(x, ...)
+\method{print}{profileLadder}(x, fancy.print = getOption("profileLadder.fancy", TRUE), ...)
 }
 \arguments{
 \item{x}{an object of the class \code{profileLadder} resulting from a call
 of one of the functions \code{parallelReserve()}, \code{mcReserve}, or
 \code{as.profileLadder()}}
+
+\item{fancy.print}{logical to indicate whether facty run-off triangle should be
+printed or standard output is used instead. The default choice is \code{TRUE}.
+Fancy printng output can be supressed by \code{options(profileLadder.fancy = FALSE)}.}
 
 \item{...}{further arguments passed to \code{print}}
 }
@@ -23,8 +27,17 @@ Function to organize and print the outputs provided by the function
 }
 \examples{
 data(CameronMutual)
+## full run-off triangle printed with the fancy mode
 x <- as.profileLadder(CameronMutual)
 print(x) 
+
+## run-off triangle with unobserved future payments 
+x <- as.profileLadder(observed(CameronMutual))
+print(x) 
+
+## the same run-off triangle using a standard printing method 
+options(profileLadder.fancy = FALSE)
+print(x)
 
 }
 \seealso{

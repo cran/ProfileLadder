@@ -10,9 +10,9 @@
 #' very uninformative. 
 #' 
 #' In practice, the reserve for such sparse run-off triangles is not estimated 
-#' by any stochastic model but, instead, an expert judgement is used to declare 
-#' the reserve. Nevertheless, the nonparametric estimation performed by PARALLAX, 
-#' REACT, or MACRAME can still provide resonable reserve estimates
+#' by any stochastic model but, instead, an expert judgement is used to set 
+#' the reserve. Nevertheless, the nonparametric reserving provided by PARALLAX, 
+#' REACT, or MACRAME can still achieve resonable reserve predictions
 #' 
 #' @name NevadaGeneral
 #' 

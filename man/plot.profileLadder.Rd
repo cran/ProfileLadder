@@ -4,7 +4,14 @@
 \alias{plot.profileLadder}
 \title{Plotting Development Profiles}
 \usage{
-\method{plot}{profileLadder}(x, xlab = "Development Year", ylab = "Cumulative Claims", main = "", ...)
+\method{plot}{profileLadder}(
+  x,
+  xlab = "Development period",
+  ylab = "Cumulative claims",
+  main = "",
+  default.legend = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of the class \code{profileLadder} (output form
@@ -16,6 +23,10 @@
 
 \item{main}{title of the plot}
 
+\item{default.legend}{logical to indicate whether a default plot legend
+(utilizing the information from the R class \code{profileLadder}) should be
+provided  (DEFAULT)}
+
 \item{...}{other graphical parameters to plot}
 }
 \value{
@@ -26,8 +37,8 @@ method---PARALLAX, REACT, or MACRAME) the and the true future profiles
 (if these are available)
 }
 \description{
-The function provides a graphical representation of the completed functional
-profiles estimated by the PARALLAX, REACT, or MACRAME algorithm (see Maciak,
+The function provides a graphical representation of the functional profiles
+estimated by the PARALLAX, REACT, or MACRAME algorithm (see Maciak,
 Mizera, and Pesta (2022) for further details). The function takes an object
 of the class \code{profileLadder} which is the output of the
 \code{parallelReserve()} function or the \code{mcReserve()} function.

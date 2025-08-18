@@ -33,14 +33,14 @@ year 1988) with ten consecutive development periods/years (in columns).
 }
 \details{
 The run-off triangle (the upper-left triangular part of the data matrix)
-contains only positive increments making the triangle suitable for the standard
-modelling approach---the over-dispersed Poisson model (GLM regression model).
+contains only positive increments making the triangle suitable for the typical
+benchmark reserving approach---the over-dispersed Poisson model (GLM regression model).
 
 In practice, the upper-left triangle (the run-off triangle) is typically
 observed (known) while the bottom-right triangular part of the data matrix is
 treated as a future payments outcome (an "unknown" truth) that should be
 estimated/predicted. The Cameron Mutual Insurance data matrix is fully observed
-to allow for some goodness-of-fit evaluations.
+(i.e., obtained retrospectively) to allow for some goodness-of-fit evaluations.
 }
 \references{
 Meyers, G. G. and P. Shi (2011). Loss reserving data pulled

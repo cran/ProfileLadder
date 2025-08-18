@@ -64,10 +64,14 @@
 summary.profileLadder <- function(object, plotOption = FALSE, ...){
 
   reserve <- object$reserve
-  completedLadder <- object$completed
-  chainLadder <- object$inputTriangle
+  completedLadder <- object$FullTriangle
+  chainLadder <- object$Triangle
   fullLadder <- object$trueComplete
   method <- unlist(strsplit(object$method, " "))[1]
+  
+  ## global colors for fancy print 
+  colors <- getOption("profileLadder.colors")
+  col.info <- colors$col.info
   
   n <- nrow(chainLadder) ### number of occurrence/development years
   last <- n * (1:n) - 0:(n - 1) ### last diagonal
@@ -102,16 +106,16 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
                              "   True Reserve", "  Reserve%")
 
   if (method == "Run-off"){### run-off triangle only
-    cat(method, "triangle (no estimation algorithm applied)\n")
+    cat(paste(method, "triangle (no estimation algorithm applied)\n", sep = " "))
     print(sTable)
     cat("\n")
   } else {### estimated triangle (PARALLAX, REACT, MACRAME)
-    cat(method, "estimated reserve (by origins)\n")
+    cat(paste(method, "reserve prediction (by origins)\n", sep = " "))
     print(sTable)
     cat("\n")
     
-    message("Overall reserve summary")
-    print(reserveSummary)
+    message(col.info("Overall reserve summary"))
+    print(reserveSummary[c(3,2,1,4,5)])
     cat("\n")
   }
   
@@ -130,13 +134,13 @@ summary.profileLadder <- function(object, plotOption = FALSE, ...){
     names(residSummary) <- c(" Min", " 1st Q.", " Median", " Mean", " 3rd Q.", 
                              " Max", " Std.Er.")
     ### print output
-    message(residType)
+    message(col.info(residType))
     print(residSummary)
     cat("\n")
     cat(paste("Total number of residuals: ", length(resids), 
                 ",  Total number of unique residuals: ", length(unique(resids)), "\n", sep = ""))
-    cat(paste("Suspicious residuals (using 2\u03C3 rule): ", sum(abs(resids) > 2 * stats::sd(resids)), 
-              ",  Outliers (3\u03C3 rule): ",  sum(abs(resids) > 3 * stats::sd(resids)),"\n", sep = ""))
+    cat(paste("Suspicious residuals (using 2\u03C3 rule): ", sum(abs(resids - mean(resids)) > 2 * stats::sd(resids)), 
+              ",  Outliers (3\u03C3 rule): ",  sum(abs(resids - mean(resids)) > 3 * stats::sd(resids)),"\n", sep = ""))
     
     
     if (plotOption == T){

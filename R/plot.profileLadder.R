@@ -1,7 +1,7 @@
 #' Plotting Development Profiles 
 #'
-#' The function provides a graphical representation of the completed functional 
-#' profiles estimated by the PARALLAX, REACT, or MACRAME algorithm (see Maciak, 
+#' The function provides a graphical representation of the functional profiles 
+#' estimated by the PARALLAX, REACT, or MACRAME algorithm (see Maciak, 
 #' Mizera, and Pesta (2022) for further details). The function takes an object 
 #' of the class \code{profileLadder} which is the output of the 
 #' \code{parallelReserve()} function or the \code{mcReserve()} function. 
@@ -13,6 +13,9 @@
 #' @param xlab label for the x axis
 #' @param ylab label for the y axis
 #' @param main title of the plot
+#' @param default.legend logical to indicate whether a default plot legend 
+#' (utilizing the information from the R class \code{profileLadder}) should be 
+#' provided  (DEFAULT)
 #' @param ... other graphical parameters to plot
 #' @return A graph with the observed functional development profiles from the 
 #' input run-off triangle, the estimated/predicted functional segments (i.e., 
@@ -38,12 +41,13 @@
 #' 
 #' @export
 #' @method plot profileLadder
-plot.profileLadder <- function(x, xlab = "Development Year", 
-                                  ylab = "Cumulative Claims", main = "", ...){
+plot.profileLadder <- function(x, xlab = "Development period", 
+                                  ylab = "Cumulative claims", main = "", 
+                                  default.legend = TRUE, ...){
   
   predictedReserve <- x$reserve[3]
-  completedLadder <- x$completed
-  chainLadder <- x$inputTriangle
+  completedLadder <- x$FullTriangle
+  chainLadder <- x$Triangle
   fullLadder <- x$trueComplete
   method <- unlist(strsplit(x$method, " "))[1]
   
@@ -88,19 +92,21 @@ plot.profileLadder <- function(x, xlab = "Development Year",
       graphics::matlines(1:ncol(completedLadder), t(completedLadder), col = "red", lwd = 1, lty = 1)
       graphics::points(rep(n,n), completedLadder[1:n,n], pch =21, bg = "darkred", cex = 1)
       
-      graphics::legend("topleft", legend = c(paste("Total Paid Amount: ", 
-                                                   round(sum(chainLadder[last],0)), sep = ""), 
-                                          paste("True (unknown) reserve: ", 
-                                                round(sum(fullLadder[,n]) - sum(chainLadder[last]) ,0), sep = ""), 
-                                          paste(method, " estimated reserve: ", 
-                                                round(predictedReserve ,0), sep = "")),  
-             pch = 22, pt.bg = c("darkblue", "gray", "red"), fill = "lightgray", 
-             border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      if (default.legend){
+        graphics::legend("bottomright", legend = c(paste(method, " predicted reserve: ", 
+                                                         round(predictedReserve ,0), sep = ""),
+                                                   paste("Running diagonal: ", 
+                                                         round(sum(chainLadder[last],0)), sep = ""),
+                                                   paste("True (unknown) reserve: ", 
+                                                         round(sum(fullLadder[,n]) - sum(chainLadder[last]) ,0), sep = "")),  
+                         pch = 22, pt.bg = c("red", "darkblue", "gray"), fill = "lightgray", 
+                         border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      }
     } else {
-      graphics::legend("topleft", legend = c(paste("Total Paid Amount: ", 
-                                                   round(sum(chainLadder[last],0)), sep = ""), 
-                                          paste("True (unknown) reserve: ", 
-                                                round(sum(fullLadder[,n]) - sum(chainLadder[last]) ,0), sep = "")),  
+      graphics::legend("bottomright", legend = c(paste("Running dianonal: ", 
+                                                       round(sum(chainLadder[last],0)), sep = ""), 
+                                                 paste("True (unknown) reserve: ", 
+                                                       round(sum(fullLadder[,n]) - sum(chainLadder[last]) ,0), sep = "")),  
              pch = 22, pt.bg = c("darkblue", "gray"), fill = "lightgray", 
              border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
     }
@@ -116,17 +122,21 @@ plot.profileLadder <- function(x, xlab = "Development Year",
       graphics::matlines(1:ncol(completedLadder), t(completedLadder), col = "red", lwd = 1, lty = 1)
       graphics::points(rep(n,n), completedLadder[1:n,n], pch =21, bg = "darkred", cex = 1)
       
-      graphics::legend("topleft", legend = c(paste("Total Paid Amount: ", 
-                                                   round(sum(chainLadder[last],0)), sep = ""), 
-                                          paste(method, " estimated reserve: ", 
-                                                round(predictedReserve ,0), sep = "")),  
-             pch = 22, pt.bg = c("darkblue", "red"), fill = "lightgray", 
-             border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      if (default.legend){
+        graphics::legend("bottomright", legend = c(paste(method, " predicted reserve: ", 
+                                                         round(predictedReserve ,0), sep = ""), 
+                                                   paste("Running diagonal: ", 
+                                                         round(sum(chainLadder[last],0)), sep = "")),  
+                         pch = 22, pt.bg = c("red", "darkblue"), fill = "lightgray", 
+                         border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      }
     } else {
-      graphics::legend("topleft", legend = c(paste("Total Paid Amount: ", 
-                                                   round(sum(chainLadder[last],0)), sep = "")),  
-             pch = 22, pt.bg = c("darkblue"), fill = "lightgray", 
-             border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      if (default.legend){
+        graphics::legend("bottomright", legend = c(paste("Running diagonal: ", 
+                                                         round(sum(chainLadder[last],0)), sep = "")),  
+                         pch = 22, pt.bg = c("darkblue"), fill = "lightgray", 
+                         border = "lightgray", box.lwd = 0, box.col = "white", bg = "white")
+      }
     }
   }
 }

@@ -4,22 +4,34 @@
 \alias{permuteReserve}
 \title{Permutation Bootstrap Reserve (PARALLAX, REACT, MACRAME)}
 \usage{
-permuteReserve(object, B = 500, std = TRUE, quantile = 0.995)
+permuteReserve(object, B = 500, std = TRUE, quantile = 0.995, adjustMC = TRUE)
 }
 \arguments{
-\item{object}{an object of the class \code{profileLadder} (output from
-\code{parallelReserve()} or \code{mcReserve()} respectively)}
+\item{object}{an object which is the result of some functional-based reserving
+method implemented in the ProfileLadder package (functions \code{parallelReserve()}
+and \code{mcReserve()} in particular) or some parametric approach from the
+ChainLadder package (specifically the functions \code{chainladder()},
+\code{glmReserve()}, \code{tweedieReserve()}, and \code{MackChainLadder()}).
+The following \code{object}'s classes are allowed: \code{profileLadder},
+\code{ChainLadder}, \code{glmReserve}, \code{tweedieReserve}, and \code{MackChainLadder}.}
 
-\item{B}{number of permutations to be performed (DEFAULT \code{B = 500})}
+\item{B}{number of the bootstrap permutations to be performed (by DEFAULT the
+number of permutations is set to \code{B = 500})}
 
 \item{std}{logical to indicate whether the run-off triangle should be
-standardized by the first column increments (DEFAULT) or not (\code{std = FALSE}).
-For more details about the triangle standardization, see Maciak, Mizera, and
-Pešta (2022)}
+standardized by the first column increments (\code{TRUE} by DEFAULT) or not
+(\code{std = FALSE}).For more details about the triangle standardization,
+see Maciak, Mizera, and Pešta (2022)}
 
 \item{quantile}{quantile level for the \code{BootVar.} characteristic of the
 bootstrapped distribution (the DEFAULT choice \code{quantile = 0.995} is
 explicitly required  by the Solvency II principle used by actuaries in practice)}
+
+\item{adjustMC}{logical (\code{TRUE} by DEFAULT) to indicate whether the Markov
+chain states and the corresponding breaks should be adjusted for every bootstrap
+permutation or the same set of Markov states and breaks is used for each permuted
+run-off triangle (only applies if the input \code{object} is an output
+of the MACRAME algorithm---the function \code{mcReserve()})}
 }
 \value{
 An object of the class \code{permutedReserve} which is a list with
@@ -52,30 +64,43 @@ incremental diagonals}
 \item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the
 number of the origin/development periods) with \code{B} simulated cumulative
 diagonals}
-\item{inputTriangle}{The input run-off triangle}
-\item{completed}{The completed run-off triangle by using one of the PARALLAX,
+\item{pFirst}{A matrix of the dimension \code{B x n} (\code{n} being the
+number of the origin/development periods) with \code{B} simulated first payment
+columns (all columns are identical for \code{std = TRUE})}
+\item{Triangle}{The input run-off triangle}
+\item{FullTriangle}{The completed run-off triangle by using one of the PARALLAX,
 REACT, or MACRAME estimation method}
 \item{trueComplete}{The true complete run-off triangle (if available) and \code{NA}
 value otherwise}
-\item{info}{a numeric vector summarizing the bootstrap compuational efficiency:
+\item{info}{a numeric vector summarizing the bootstrap computational efficiency:
 In particular, the OS/Architecture type, the number of permutations (\code{B}),
 the input run-off triangle dimension (\code{n}) and the computation time needed
 for the permutation bootstrap calculations}
 }
 \description{
-The function takes the output from the function \code{parallelReserve()} or
-\code{mcReserve} and estimates the overall reserve distribution in terms of the
-permutation bootstrap approach proposed in Maciak, Mizera, and Pešta (2022).
+The function takes a completed run-off triangle provided either by some classical
+parametric reserving technique (ODP model, Mack model, or Tweedie model) or some
+functional-based alternative (PARALLAX, REACT, or MACRAME) and estimates the overall
+reserve distribution in terms of the permutation bootstrap approach proposed
+in Maciak, Mizera, and Pešta (2022).
 }
 \examples{
 ## REACT algorithm and the permutation bootstrap reserve 
 data(CameronMutual)
 output <- parallelReserve(CameronMutual, method = "react")
-permuteReserve(output, B = 100)
+summary(permuteReserve(output, B = 100))
 
-## MACRAME algorithm with a pre-specified number of states 
+## MACRAME algorithm with a pre-specified number of states using the same MC 
+## states and the same break for each permuted run-off triangle
 output <- mcReserve(CameronMutual, states = 5)
-permuteReserve(output, B = 100)
+plot(permuteReserve(output, B = 100, adjustMC = FALSE))
+
+## Permutation bootstrap applied to a completed run-off triangle 
+## obtained by a parametric Over-dispersed Poisson model (from ChainLadder pkg)
+library("ChainLadder")
+output <- permuteReserve(glmReserve(MW2008), B = 100)
+summary(output, triangle.summary = TRUE)
+
 
 
 }
@@ -90,5 +115,5 @@ Journal of the European Union, 1–155.\cr
 \url{https://data.europa.eu/eli/dir/2009/138/oj}
 }
 \seealso{
-\code{\link[=parallelReserve]{parallelReserve()}}, \code{\link[=mcReserve]{mcReserve()}}, \code{\link[=plot.permutedReserve]{plot.permutedReserve()}}
+\code{\link[=parallelReserve]{parallelReserve()}}, \code{\link[=mcReserve]{mcReserve()}}, \code{\link[=plot.permutedReserve]{plot.permutedReserve()}}, \code{\link[=summary.permutedReserve]{summary.permutedReserve()}}
 }

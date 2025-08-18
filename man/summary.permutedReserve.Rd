@@ -2,13 +2,18 @@
 % Please edit documentation in R/summary.permutedReserve.R
 \name{summary.permutedReserve}
 \alias{summary.permutedReserve}
-\title{Summary Method for Objects of the S3 Class Method \code{permutedReserve}}
+\title{Summary Method for the S3 Objects \code{permutedReserve}}
 \usage{
-\method{summary}{permutedReserve}(object, ...)
+\method{summary}{permutedReserve}(object, triangle.summary = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of the class \code{permutedReserve} -- i.e., the output
 form the \code{permuteReserve()} functions}
+
+\item{triangle.summary}{logical (\code{FALSE} by DEFAULT) indicating whether a
+brief table with the empirical summary of the permutted run-off triangles (the first column,
+the last running diagonal, and the ultimate amounts in particular) should be
+printed in the output or not}
 
 \item{...}{not used}
 }
@@ -27,9 +32,9 @@ diagonal in the run-off triangle); The third column (\code{Dev.To.Date}) gives
 a relative proportion of the paid amount (\code{Latest}) with respect to the
 estimated ultimate (\code{Ultimate}) given in the fourth column; The column
 denoted as \code{IBNR} gives the estimated amount still left to pay (Incurred
-But Not Reported)}; The sixth column provides the estimated standard errors
+But Not Reported); The sixth column provides the estimated standard errors
 (\code{S.E.}) of IBNR obtained from the permutation bootstrap; The last column returns
-the corresponding coefficients of variation (\code{CV}).
+the corresponding coefficients of variation (\code{CV}).}
 \item{overall}{Table with the summary of the true/estimated reserve:
 \code{Paid amount} represents the sum of the last running diagonal;
 \code{Estimated reserve} gives the reserve estimate provided by one of the
@@ -48,7 +53,7 @@ mean of the bootstrap distribution; Finally, \code{BootVar.xxx} provides the
 estimated quantile of the bootstrap reserve distribution (0.995 by DEFAULT).}
 }
 \description{
-The function provides an overall summary of the output from the functions
+The function provides an overall summary of the output from the function
 \code{permuteReserve()} (i.e., the summary of the object of the class
 \code{permutedReserve})
 }

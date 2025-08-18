@@ -1,22 +1,28 @@
 #' Access Markov Chain States in the MACRAME Algorithm
 #'
 #' Retrieves the Markov chain components from a \code{profileLadder} object returned 
-#' from the function \code{mcReserve()} -- in particular, the function returns 
-#' the vector of states used by the underlying Markov Chain utilized in the MACRAME 
-#' reserve prediction.
+#' from the function \code{mcReserve()} or the \code{mcSetup} object returned 
+#' from the function \code{incrExplor()}. In particular, the function returns 
+#' the vector of the states used by the underlying Markov Chain utilized for  
+#' reserve prediction in the MACRAME algorithm.
 #'
-#' @param object An object of class \code{profileLadder}.
+#' @param object An object of the class \code{profileLadder} returned from the function 
+#' \code{mcReserve()} or an object of the class \code{mcSetup} returned from the 
+#' function \code{incrExplor()}.
 #' 
 #' @return The vector of the Markov chain states that are used by the MACRAME algorithm.
 #' 
-#' @seealso [mcReserve()], [mcBreaks()], [mcTrans()]
+#' @seealso [mcReserve()], [incrExplor()], [mcBreaks()], [mcTrans()]
 #' 
 #' @examples
 #' ## MACRAME reserve prediction with the DEFAULT Markov chain setup 
 #' output <- mcReserve(CameronMutual)
 #' 
-#' ## Extracting the corresponding break points
+#' ## Extracting the corresponding Markov states
 #' mcStates(output)
+#' 
+#' #' ## Extracting the corresponding states when explicit breaks are used
+#' mcStates(mcReserve(CameronMutual, breaks = c(1000, 2000, 3000)))
 #' 
 #' @export
 mcStates <- function(object) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/incrExplor.R
 \name{incrExplor}
 \alias{incrExplor}
-\title{Exploratory Function for Run-Off Triangle Increments}
+\title{Exploration of Run-Off Triangle Increments}
 \usage{
 incrExplor(
   triangle,
@@ -25,19 +25,21 @@ summarize the run-off triangle increments within the given set of bins. Each
 bin with the increments  is represented by a corresponding Markov state value
 (obtained by the \code{method} choice with \code{median} being the DEFAULT option)}
 
-\item{out}{integer value (or a vector of integers) to indicate which columns
+\item{out}{integer value ranging from 1 to the number of development periods
+(alternatively a vector of such integers) to indicate which columns
 of the run-off triangle should be excluded
 from the exploratory analysis of the increments. By DEFAULT, the first
 incremental payments---i.e., the first column of the run-off triangle---are
 not considered (\code{out = 1}). No colums are exluded for \code{out = 0} and
 the whole run-off triangle is analyzed by \code{incrExplor()}. To specify
 multiple columns that should be excluded, one can use \code{out = c(1,2,3)}
-which will exlude the first three columns from the exploratory analysis}
+which will exlude the first three columns (the first three origins respectively)
+from the exploratory analysis}
 
 \item{states}{either an integer value to indicate an explicit number of the
 Markov chain states to be used or  a vector of explicit Markov chain states
-can be provided. The DEFAULT option (\code{states = NULL}) provides a fully
-data-driven (automatic) definition of the Markov chain states as proposed
+can be provided. The DEFAULT option (\code{states = NULL}) ensures a fully
+data-driven (automatic) set of the Markov chain states as originally proposed
 in Maciak, Mizera, and Pešta (2022)}
 
 \item{breaks}{numeric vector of explicit (unique and monotonously increasing)
@@ -65,7 +67,7 @@ in the first column of the run-off triangle). Two sets of increments are provide
 the raw incremental payments in the first row of the table and the standardized
 increments (i.e., row incremental payments divided by the maximum payment within
 the row (while not considering the columns specified by the \code{out} parameter)}
-\item{userDefined}{a list with all information regarding the USER modified input
+\item{userDefined}{a list with all information regarding the user modified input
 (numeric vector \code{increments} with the increments being analyzed; numeric
 value in \code{outColumns} denoting the excluded columns in the run-off triangle;
 \code{method} used to summarize the increments within the bins; numeric vector
@@ -75,11 +77,11 @@ the run-off triangle increments)}
 }
 \description{
 The function takes a cumulative or incremental run-off triangle (partially or
-completely observed) and provides some basic exploratory and graphical
-inspection of the observed incremental payments. The function serves as
-a useful tool for a user-based insight when manualy defining the states of
+completely observed) and provides some basic exploratory  of the observed
+incremental payments. The function serves as
+a useful tool for a user-based insight when manually defining the states of
 the Markov Chain that is used to drive the reserve prediction in the MACRAME
-algorithm implemented in the function \code{mcReserve()}.
+algorithm implemented within the function \code{mcReserve()}.
 }
 \examples{
 data(CameronMutual) 
@@ -109,5 +111,5 @@ Maciak, M., Mizera, I., and Pešta, M. (2022). Functional Profile
 Techniques for Claims Reserving. ASTIN Bulletin, 52(2), 449-482. DOI:10.1017/asb.2022.4
 }
 \seealso{
-\code{\link[=mcReserve]{mcReserve()}}, \code{\link[=permuteReserve]{permuteReserve()}}
+\code{\link[=mcBreaks]{mcBreaks()}}, \code{\link[=mcStates]{mcStates()}}, \code{\link[=mcReserve]{mcReserve()}}, \code{\link[=permuteReserve]{permuteReserve()}}
 }

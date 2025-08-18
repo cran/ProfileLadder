@@ -1,19 +1,32 @@
 #' Permutation Bootstrap Reserve (PARALLAX, REACT, MACRAME)
 #'
-#' The function takes the output from the function \code{parallelReserve()} or 
-#' \code{mcReserve} and estimates the overall reserve distribution in terms of the 
-#' permutation bootstrap approach proposed in Maciak, Mizera, and Pešta (2022).
+#' The function takes a completed run-off triangle provided either by some classical 
+#' parametric reserving technique (ODP model, Mack model, or Tweedie model) or some 
+#' functional-based alternative (PARALLAX, REACT, or MACRAME) and estimates the overall 
+#' reserve distribution in terms of the permutation bootstrap approach proposed 
+#' in Maciak, Mizera, and Pešta (2022).
 #'
-#' @param object an object of the class \code{profileLadder} (output from 
-#' \code{parallelReserve()} or \code{mcReserve()} respectively)
-#' @param B number of permutations to be performed (DEFAULT \code{B = 500})
+#' @param object an object which is the result of some functional-based reserving 
+#' method implemented in the ProfileLadder package (functions \code{parallelReserve()} 
+#' and \code{mcReserve()} in particular) or some parametric approach from the 
+#' ChainLadder package (specifically the functions \code{chainladder()}, 
+#' \code{glmReserve()}, \code{tweedieReserve()}, and \code{MackChainLadder()}). 
+#' The following \code{object}'s classes are allowed: \code{profileLadder}, 
+#' \code{ChainLadder}, \code{glmReserve}, \code{tweedieReserve}, and \code{MackChainLadder}. 
+#' @param B number of the bootstrap permutations to be performed (by DEFAULT the 
+#' number of permutations is set to \code{B = 500})
 #' @param std logical to indicate whether the run-off triangle should be 
-#' standardized by the first column increments (DEFAULT) or not (\code{std = FALSE}). 
-#' For more details about the triangle standardization, see Maciak, Mizera, and 
-#' Pešta (2022)
+#' standardized by the first column increments (\code{TRUE} by DEFAULT) or not 
+#' (\code{std = FALSE}).For more details about the triangle standardization, 
+#' see Maciak, Mizera, and Pešta (2022)
 #' @param quantile quantile level for the \code{BootVar.} characteristic of the 
 #' bootstrapped distribution (the DEFAULT choice \code{quantile = 0.995} is 
 #' explicitly required  by the Solvency II principle used by actuaries in practice)  
+#' @param adjustMC logical (\code{TRUE} by DEFAULT) to indicate whether the Markov 
+#' chain states and the corresponding breaks should be adjusted for every bootstrap 
+#' permutation or the same set of Markov states and breaks is used for each permuted
+#' run-off triangle (only applies if the input \code{object} is an output 
+#' of the MACRAME algorithm---the function \code{mcReserve()})
 #' 
 #' @returns An object of the class \code{permutedReserve} which is a list with  
 #' the following elements: 
@@ -45,27 +58,38 @@
 #' \item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the 
 #' number of the origin/development periods) with \code{B} simulated cumulative
 #' diagonals}
-#' \item{inputTriangle}{The input run-off triangle}
-#' \item{completed}{The completed run-off triangle by using one of the PARALLAX, 
+#' \item{pFirst}{A matrix of the dimension \code{B x n} (\code{n} being the 
+#' number of the origin/development periods) with \code{B} simulated first payment 
+#' columns (all columns are identical for \code{std = TRUE})}
+#' \item{Triangle}{The input run-off triangle}
+#' \item{FullTriangle}{The completed run-off triangle by using one of the PARALLAX, 
 #' REACT, or MACRAME estimation method}
 #' \item{trueComplete}{The true complete run-off triangle (if available) and \code{NA}
 #' value otherwise}
-#' \item{info}{a numeric vector summarizing the bootstrap compuational efficiency: 
+#' \item{info}{a numeric vector summarizing the bootstrap computational efficiency: 
 #' In particular, the OS/Architecture type, the number of permutations (\code{B}), 
 #' the input run-off triangle dimension (\code{n}) and the computation time needed
 #' for the permutation bootstrap calculations}
 #' 
-#' @seealso [parallelReserve()], [mcReserve()], [plot.permutedReserve()]
+#' @seealso [parallelReserve()], [mcReserve()], [plot.permutedReserve()], [summary.permutedReserve()]
 #' 
 #' @examples
 #' ## REACT algorithm and the permutation bootstrap reserve 
 #' data(CameronMutual)
 #' output <- parallelReserve(CameronMutual, method = "react")
-#' permuteReserve(output, B = 100)
+#' summary(permuteReserve(output, B = 100))
 #' 
-#' ## MACRAME algorithm with a pre-specified number of states 
+#' ## MACRAME algorithm with a pre-specified number of states using the same MC 
+#' ## states and the same break for each permuted run-off triangle
 #' output <- mcReserve(CameronMutual, states = 5)
-#' permuteReserve(output, B = 100)
+#' plot(permuteReserve(output, B = 100, adjustMC = FALSE))
+#' 
+#' ## Permutation bootstrap applied to a completed run-off triangle 
+#' ## obtained by a parametric Over-dispersed Poisson model (from ChainLadder pkg)
+#' library("ChainLadder")
+#' output <- permuteReserve(glmReserve(MW2008), B = 100)
+#' summary(output, triangle.summary = TRUE)
+#' 
 #' 
 #' 
 #' @references Maciak, M., Mizera, I., and Pešta, M. (2022). Functional Profile 
@@ -77,11 +101,11 @@
 #' \url{https://data.europa.eu/eli/dir/2009/138/oj}
 #' 
 #' @export
-permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
+permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjustMC = TRUE){
   ### input data checks
-  if (!inherits(object, "profileLadder")){
-    stop("The input object must be of a class 'profileLadder'")}
-  if (inherits(object, "profileLadder") && all(is.na(object$completed))){
+  if (!inherits(object, c("profileLadder", "glmReserve", "tweedieReserve", "MackChainLadder", "ChainLadder"))){
+    stop("The input object must be of a class 'profileLadder', 'glmReserve', 'tweedieReserve', 'MackChainLadder' or 'ChainLadder'")}
+  if (inherits(object, "profileLadder") && all(is.na(object$FullTriangle))){
     stop("The input object must be a result of 'parallelReserve()' or 'mcReserve()'")}
   if (!is.numeric(B) || length(B) > 1){
     stop("The number of bootstrap permutations 'B' must be a numeric (integer) value")}
@@ -94,28 +118,57 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   if (quantile >= 1 || quantile <= 0){
     stop("The quantile value must be in interval (0,1)")}
   
-  ### reserve summary
-  reserve <- object$reserve 
-  ### estimation method ()
-  method <- unlist(strsplit(object$method, split = " "))[1]
-  completed <- object$completed
-  inputTriangle <- object$inputTriangle
-  trueComplete <- object$trueComplete
   
-  if (method == "MACRAME"){
-    if (!is.null(object$MarkovChain)){
-      states <- object$MarkovChain$states
-      breaks <- object$MarkovChain$breaks
-      std <- FALSE
-    } else {
-      states <- NULL
-      breaks <- NULL
+  ### reserving method | extract info
+  inputTriangle <- object$Triangle
+  if (inherits(object, "ChainLadder")){
+    completedTriangle <- ChainLadder::predict(object) 
+  } else {
+    completedTriangle <- object$FullTriangle
+  }
+  
+  
+  if (inherits(object, c("glmReserve", "tweedieReserve", "MackChainLadder", "ChainLadder"))){### ChainLadder pkg
+    reserve <- NA
+    trueComplete <- NA
+  }
+  if (inherits(object, "glmReserve")){method <- "GLM"}
+  if (inherits(object, "tweedieReserve")){
+    method <- "Tweedie model"
+    varPower <- log(object$family$variance(2))/log(2)
+    linkPower <- as.numeric(strsplit(object$family$link, "\\^")[[1]][2])
+  }
+  if (inherits(object, "MackChainLadder")){method <- "Mack model"}
+  
+  if (inherits(object, "ChainLadder")){method <- "Triangle model"}
+  
+  if (inherits(object, "profileLadder")){### ProfileLadder pkg
+    reserve <- object$reserve
+    trueComplete <- object$trueComplete
+    method <- unlist(strsplit(object$method, split = " "))[1]
+    if (method == "MACRAME"){
+      if (!is.logical(adjustMC)){stop("Parameter 'adjustMC' must be logical")}
+      if (!adjustMC){
+        states <- object$MarkovChain$states
+        breaks <- object$MarkovChain$breaks
+        std <- FALSE
+      } else {
+        states <- NULL
+        breaks <- NULL
+      }
     }
   }
 
+  completed <- completedTriangle
   n <- nrow(completed) ### number of occurrence/development years
   last <- n * (1:n) - 0:(n - 1) ### last diagonal
   observed <- outer(1:n, 1:n, function(i, j) j <= (n + 1 - i)) ### NA layout 
+  
+  ### reserve summary (if not inherited from profileLadder)
+  if (any(is.na(reserve))){
+    reserve <- c(sum(completed[last]), sum(completed[,n]), sum(completed[,n]) - sum(completed[last]), NA)
+    names(reserve) <- c("Paid Amount", "Estimated Ultimate", "Estimated Reserve", "True Reserve")
+  }
   
   ### triangle standardization
   if (std == TRUE){
@@ -137,13 +190,20 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
     }
     
     ### applying PARALLAX, REACT, MACRAME
-    if (method == "PARALLAX"){out <- parallelReserve(pMatrix, method = "parallax")$completed}
-    if (method == "REACT"){out <- parallelReserve(pMatrix, method = "react")$completed}
+    if (method == "GLM"){out <- ChainLadder::glmReserve(ChainLadder::as.triangle(pMatrix))$FullTriangle}
+    if (method == "Tweedie model"){out <- ChainLadder::tweedieReserve(ChainLadder::as.triangle(pMatrix), bootstrap = 0, link.power = linkPower, var.power = varPower)$FullTriangle}
+    if (method == "Mack model"){out <- ChainLadder::MackChainLadder(ChainLadder::as.triangle(pMatrix), est.sigma = "Mack")$FullTriangle}
+    if (method == "Triangle model"){
+      out <- ChainLadder::chainladder(ChainLadder::as.triangle(pMatrix))
+      out <- ChainLadder::predict(out)
+    }
+    if (method == "PARALLAX"){out <- parallelReserve(pMatrix, method = "parallax")$FullTriangle}
+    if (method == "REACT"){out <- parallelReserve(pMatrix, method = "react")$FullTriangle}
     if (method == "MACRAME"){
-      if (is.null(states) & is.null(breaks)){out <- mcReserve(pMatrix)$completed} 
-        else {out <- mcReserve(pMatrix, states = states, breaks = breaks)$completed}
+      if (is.null(states) & is.null(breaks)){out <- mcReserve(pMatrix)$FullTriangle} 
+        else {out <- mcReserve(pMatrix, states = states, breaks = breaks)$FullTriangle}
     }  
-    return(c(out[,n], rev(out[last]), rev(ChainLadder::cum2incr(out)[last])))
+    return(c(out[,n], rev(out[last]), rev(ChainLadder::cum2incr(out)[last]), out[,1]))
   }
   
   ### permutation bootstrap with time efficiency  
@@ -163,15 +223,17 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   latest <- data.frame(t(pReserve[(2 * n + 1):(3 * n),]))
   names(latest) <- paste("origin", 1:n, sep = " ")
   
+  ### bootstrapped first payments
+  first <- data.frame(t(pReserve[(3 * n + 1):(4 * n),]))
+  names(first) <- paste("origin", 1:n, sep = " ")
+  
   ### bootstrapped reserves
   reserves <- apply(pReserve[1:n,],2, sum) - apply(pReserve[(n + 1):(2 * n), ], 2, sum)
-    
+  
     
 
   ### OUTPUT section
-  estimatedReserve <- c(sum(inputTriangle[last]), sum(object$completed[,n]), 
-                        sum(object$completed[,n]) - sum(object$inputTriangle[last]), 
-                        reserve[4])
+  estimatedReserve <- reserve
   names(estimatedReserve) <- c("Paid Amount", "   Est.Ultimate", 
                                "   Est.Reserve", "   True Reserve")
   
@@ -194,6 +256,7 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   output$pUltimates <- ultimates
   output$pLatest <- latest
   output$pLatestCum <- latestCum
+  output$pFirst <- first
   
   if (all(!is.na(trueComplete))){
     output$tUltimate <- trueComplete[,n]
@@ -202,8 +265,8 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995){
   }
   output$tLatest <- rev(ChainLadder::cum2incr(inputTriangle)[last])
   
-  output$inputTriangle <- inputTriangle
-  output$completed <- object$completed
+  output$Triangle <- inputTriangle
+  output$FullTriangle <- completedTriangle
   output$trueComplete <- trueComplete
   
   time <- c(Sys.info()["sysname"], Sys.info()["machine"], paste("B = ", round(B,0), sep = ""), paste("n = ", n, sep = ""), 

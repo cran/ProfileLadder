@@ -1,15 +1,21 @@
-#' Plotting the Run-Off Triangle Increments by the MC Setting
+#' Visualization of the Run-Off Triangle Increments  for the Markov Chain
 #'
 #' The function provides a graphical visualization of the results obtained from 
-#' the function \code{incrExplor()}. In particular, the considered run-off triangle 
+#' the \code{incrExplor()} function. In particular, the considered run-off triangle 
 #' increments are distributed into the bins according the given Markov chain breaks 
-#' or states. 
+#' and states. Two figures are provided: The first figure contains a histogram 
+#' of the standard incremental residuals with a conrresponding kernel density 
+#' estimate. The second figure shows how the increments are distributed into the 
+#' given set of bins (defined by the break points). In addition, the corresponding 
+#' Markov chain states are displayed
 #'
 #' @param x an object of the class \code{mcSetup} -- i.e., the output 
 #' of the \code{incrExplor()} function
 #' @param ... other graphical parameters to plot
 #' 
-#' @return The function returns a layout with two plots. ...
+#' @return The function returns a layout with two plots: A histogram with the 
+#' run-off triangle increments and the barplot with the increments being distributed 
+#' into the given set of bins
 #' 
 #' @seealso [incrExplor()], [mcReserve()]
 #' 
@@ -71,7 +77,12 @@ plot.mcSetup <- function(x, ...){
     breaks <- x$userDefined$breaks
     states <- x$userDefined$states
     
-    main1 <- paste("(I) Histogram: Incremental triangle[ , -c(", paste(x$userDefined$outColumns, collapse = ","),")]", sep = "")
+    if (length(x$userDefined$outColumns) == 1 & x$userDefined$outColumns[1] == 0){### all increments are used
+      main1 <- paste("(I) Histogram: Full incremental triangle", sep = "")
+    } else {
+      main1 <- paste("(I) Histogram: Incremental triangle[ , -c(", paste(x$userDefined$outColumns, collapse = ","),")]", sep = "")
+    }
+    
     main2 <- "(II) USER defined: method/out/states/breaks"
   }
   

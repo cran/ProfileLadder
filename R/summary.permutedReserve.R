@@ -1,11 +1,15 @@
-#' Summary Method for Objects of the S3 Class Method \code{permutedReserve}
+#' Summary Method for the S3 Objects \code{permutedReserve}
 #'
-#' The function provides an overall summary of the output from the functions 
+#' The function provides an overall summary of the output from the function 
 #' \code{permuteReserve()} (i.e., the summary of the object of the class
 #' \code{permutedReserve})
 #'
 #' @param object an object of the class \code{permutedReserve} -- i.e., the output 
 #' form the \code{permuteReserve()} functions
+#' @param triangle.summary logical (\code{FALSE} by DEFAULT) indicating whether a
+#' brief table with the empirical summary of the permutted run-off triangles (the first column, 
+#' the last running diagonal, and the ultimate amounts in particular) should be 
+#' printed in the output or not
 #' @param ... not used
 #' 
 #' @return Summary of the completed functional profiles (provided by one of the 
@@ -22,9 +26,9 @@
 #' a relative proportion of the paid amount (\code{Latest}) with respect to the 
 #' estimated ultimate (\code{Ultimate}) given in the fourth column; The column 
 #' denoted as \code{IBNR} gives the estimated amount still left to pay (Incurred 
-#' But Not Reported)}; The sixth column provides the estimated standard errors 
+#' But Not Reported); The sixth column provides the estimated standard errors 
 #' (\code{S.E.}) of IBNR obtained from the permutation bootstrap; The last column returns
-#' the corresponding coefficients of variation (\code{CV}).
+#' the corresponding coefficients of variation (\code{CV}).}
 #' \item{overall}{Table with the summary of the true/estimated reserve: 
 #' \code{Paid amount} represents the sum of the last running diagonal; 
 #' \code{Estimated reserve} gives the reserve estimate provided by one of the 
@@ -56,9 +60,10 @@
 #' 
 #' @export
 #' @method summary permutedReserve
-summary.permutedReserve <- function(object, ...){
+summary.permutedReserve <- function(object, triangle.summary = FALSE, ...){
+  
   ### estimation methods
-  methods <- c("PARALLAX", "REACT", "MACRAME")
+  methods <- c("PARALLAX", "REACT", "MACRAME", "GLM", "Mack model", "Tweedie model")
   method <- methods[methods %in% unlist(regmatches(object$method, 
                     gregexpr(paste(methods, collapse = "|"), object$method)))]
   
@@ -72,8 +77,8 @@ summary.permutedReserve <- function(object, ...){
   pLatest <- object$pLatestCum ### cumulative (simulated) diagonals
   
   ### input/output data
-  inputTriangle <- object$inputTriangle
-  completed <- object$completed
+  inputTriangle <- object$Triangle
+  completed <- object$FullTriangle
   trueLadder <- object$trueComplete
   trueUltimate <- object$tUltimate
   trueLatest <- object$tLatest
@@ -84,6 +89,10 @@ summary.permutedReserve <- function(object, ...){
   
   last <- n * (1:n) - 0:(n - 1) ### last diagonal
   observed <- outer(1:n, 1:n, function(i, j) j <= (n + 1 - i)) ### NA layout
+  
+  ## global colors for fancy print 
+  colors <- getOption("profileLadder.colors")
+  col.info <- colors$col.info
   
   ### 1. summary of the reserve estimation (origin specific)
   latest <- rev(inputTriangle[last])[-1] ### true latest diagonal
@@ -117,18 +126,30 @@ summary.permutedReserve <- function(object, ...){
     reserve <- reserve[1:3]
   }
   
-  ### 3. summary of the overall reserve distribution
+  ### 3. summary of the bootstrapped triangles reserve distribution
+  pTable <- data.frame(cbind(apply(object$pFirst, 2, mean), apply(object$pFirst, 2, stats::sd),
+                  apply(object$pLatestCum, 2, mean), apply(object$pLatestCum, 2, stats::sd),
+                  apply(object$pUltimates, 2, mean), apply(object$pUltimates, 2, stats::sd)))
+  names(pTable) <- c("Boot.Firsts", "(Std.Er)", "Boot.Latests", "(Std.Er)", "Boot.Ultimates", "(Std.Err)")
   
-  output <- list()
-  output$origins <- sTable
-  output$overall <- reserve
-  output$dist <- distSummary
   
-  cat(paste(method, "based reserving (with B =", B, "bootstrap permutations)\n", sep = " "))
+  cat(paste(method, "based reserve prediction (with B =", B, "bootstrap permutations)\n", sep = " "))
   print(sTable)
   cat("\n")
   
-  message("Overall reserve distribution")
+  message(col.info("Overall reserve distribution"))
   print(distSummary)
   cat("\n")
+  
+  reserveQuantile <- format(round(100 * which(sort(c(pReserve, object$eSummary[3])) == object$eSummary[3])/(length(pReserve) + 1), 2), nsmall = 2)
+  cat(paste("The ", method, " predicted reserve represents the ", reserveQuantile, "% quantile of the reserve distribution\n", sep = ""))
+  cat(paste("Bootstrap simulated reserves beyond 2\u03C3 rule: ", sum(pReserve > mean(pReserve) + 2 * stats::sd(pReserve)), " (out of ", B,")\n\n", sep = ""))
+  
+  if (!is.logical(triangle.summary)){print("The parameter 'triangle.summary' must be logical")}
+  if (triangle.summary){
+    cat(paste("Summary of the permuted run-off triangles (First, Latest, Ultimate)\n", sep = " "))
+    print(pTable)
+    cat("\n")
+  }
+  
 }

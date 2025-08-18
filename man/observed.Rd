@@ -10,7 +10,7 @@ observed(object, cum = TRUE)
 \item{object}{either an integer value to denote the dimension of the run-off
 triangle layout (i.e., the value that represents the number of origins (rows)
 and also the number of the development periods (columns)). Alternatively,
-a cumulatige or incremental run-off triangle (i.e, an object of the class
+a cumulative or incremental run-off triangle (i.e, an object of the class
 \code{matrix} or \code{triangle}) can be provided in \code{object}. In such
 case the output returns the standard run-off triangle with \code{NA} values
 in the lower-right triangular part of the matrix (regardless of wheter the
@@ -33,16 +33,21 @@ Depending on the choice of the \code{cum} parameter, either a cumulative
 (\code{DEFAULT}) or incremental (\code{cum = FALSE}) run-off triangle is returned
 }
 \description{
-Simple layout function to make work with (cumulative or incremental) run-off
-triangles more easy and straightforward.
+Simple layout function to  allow work with fully developed run-off triangles
+(i.e., completed squares that also contain typically unknown (future) claim
+payments). Such data are not common in actuarial practice but
+they are usefull for retrospective analysis and back-testing purposes.
 }
 \examples{
+## observed/unobserved layout for the run-off triangle with 5 origins
 print(observed(5))
 print(!observed(5))
 
-data(CameronMutual)
-observed(CameronMutual)
-observed(CameronMutual, cum = FALSE)
+## fully observed run-off triangle with typically unknown (future) payments
+## included in the lower-right triangular part for evaluation purposes
+data(CameronMutual) ## the full data matrix
+observed(CameronMutual) ## cummulative run-off triangle
+observed(CameronMutual, cum = FALSE) ## incremental run-off triangle
 
 }
 \seealso{

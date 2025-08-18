@@ -15,7 +15,7 @@ of the \code{permuteReserve()} function}
 \value{
 The function returns a layout for four plots. The first panel shows
 a simple barplot type visualization of the estimated reserve, the estimated
-ultimate and the true reserve (if available). The second panel provides
+ultimate, and the true reserve (if available). The second panel provides
 a histogram for (permuted) bootstrapped reserves with a nonparametric estimate
 of the corresponding density. The third panel provides a detailed inspection
 of the bootstrapped ultimates (with true ultimates if provided) and, finaly,
@@ -24,10 +24,12 @@ the last panel shows the observed diagonal vs. simulated ones.
 \description{
 The function provides a graphical visualization of the results obtained from
 the permutation bootstrap (see Maciak, Mizera, and Pesta (2022) for further
-details) applied to the output of one of the nonparametric functional based
-estimation algorithm---PARALLAX or REACT implemented in the
-\code{parallelReserve()} function or MACRAME implemented in the
-\code{mcReserve()} function.
+details) applied to the output of some parametric or nonparametric reserving
+technique. In particular, the classical parametric methods include GLM based
+reserving, the Mack Chain Ladder model, and the Tweedie model (all implemented
+in the package \code{ChainLadder}). Nonparametric (so-called functional-based)
+methods include three algorithms implemented in the \code{ProfileLadder}
+package (PARALLAX, REACT, and MACRAME)
 }
 \examples{
 ## reserve estimated by MACRAME and the corresponding visualization

@@ -1,24 +1,24 @@
 #' S3 Method Class \code{profileLadder}
 #'
 #' A function to make the work with the functional development profiles within 
-#' run-off triangles more easy and straightforward (particularly when vizualizing 
-#' the functional profiles---observed, completed, or both---in a plot)
+#' run-off triangles more easy and straightforward---particularly when vizualizing 
+#' the functional profiles (observed, completed, or both simultaneously) in a single plot
 #'
 #' @param x an object of the class \code{matrix} or \code{triangle}
 #' 
 #' @return an object of the class \code{profileLadder} which is a list with the 
 #' following elements: 
-#' \item{reserve}{basic summary of the run-off triangle and the true/estimated
+#' \item{reserve}{basic summary of the run-off triangle and the predicted/true 
 #' reserve (if it is available otherwise \code{NA} values are provided instead)}
 #' \item{method}{type of the printed triangle (either a run-off triangle itself 
-#' if no estimation method is applied or the completed triangle where the missing 
+#' if no prediction method is applied or the completed triangle where the missing 
 #' fragments are imputed by one of the algorithm, PARALLAX, REACT, or MACRAME)}
-#' \item{completed}{completed development profiles estimated by using one of the 
+#' \item{Triangle}{input (triangular shaped)  run-off triangle}
+#' \item{FullTriangle}{completed development profiles imputed by using one of the 
 #' estimation algorithm (i.e., PARALLAX, REACT, or MACRAME)---if applied---value 
 #' \code{NA} provided otherwise}
-#' \item{inputTriangle}{standard (triangular shaped)  run-off triangle}
-#' \item{trueComplete}{true completed development profiles of the run-off triangle 
-#' (if available) or  \code{NA} returned otherwise}
+#' \item{trueComplete}{true fully developmed profiles of the run-off triangle 
+#' (if available for back-testing purposes) or  \code{NA} returned otherwise}
 #' 
 #' @seealso [parallelReserve()], [mcReserve()], [permuteReserve()], 
 #' [plot.profileLadder()]
@@ -55,8 +55,9 @@ as.profileLadder <- function(x){
       output$method <- "Run-off triangle" 
     }
     
-    output$completed <- NA
-    output$inputTriangle <- ChainLadder::as.triangle(observed(x))
+    output$Triangle <- ChainLadder::as.triangle(observed(x))
+    output$FullTriangle <- NA
+    
     if (all(is.na(x[!observed(n)]))){### incomplete run-off triangle
       output$trueComplete <- NA
     } else {### true completed triangle

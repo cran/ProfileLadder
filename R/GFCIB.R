@@ -19,9 +19,9 @@
 #' @usage data(GFCIB)
 #'
 #' @format ## GFCIB
-#' Four data matrices of the dimensions \code{60x60}  of a class \code{triangle} 
-#' with \code{15} origin years (provided on a quarterly basis in individual rows) 
-#' and \code{60} development periods/quartals (columns)
+#' Four run-off triangles (objects of the class \code{triangle}) with the dimensions 
+#' \code{60x60} with \code{15} origin years (provided on a quarterly basis in 
+#' individual rows) and \code{60} development periods/quarters (columns)
 #' 
 #' \describe{
 #'   \item{origin}{matrix rows with the occurrence quartal (origin)}

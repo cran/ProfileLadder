@@ -31,3 +31,14 @@ mcTrans.profileLadder <- function(object){
 
   return(object$MarkovChain$transitionMatrix)
 }
+
+#' @export
+mcTrans.mcSetup <- function(object){
+  ### no transition matrix applicable for incrExplor() function
+  if (!inherits(object, "mcSetup")){stop("The input object must be of class 'mcSetup' which is an output from the function incrExplor()")}
+  if (inherits(object, "mcSetup")){
+    message("There is no transition matrix being estimated with the 'incrExplor()' function")
+    message("(use the 'mcReserve()' function to get the estimated transition probabilities)")
+  }
+}
+

@@ -1,15 +1,15 @@
 #' Parallel Based Development Profile Reserve 
 #'
 #' The function takes a cumulative (or incremental) run-off triangle (partially 
-#' or completely observed) and returns the reserve estimate obtained by the 
+#' or completely observed) and returns the reserve prediction obtained by the 
 #' PARALLAX or REACT algorithm (see Maciak, Mizera, and Pešta (2022) for more 
-#' details). If the full square is provided as the input then the algorithms still 
-#' rely only on the partially observed data---run-off triangle only (i.e., the 
-#' top-left triangular part of the data)---when estimating the underlying reserve 
-#' but, in addition, incremental residuals (true increments minus predicted 
-#' increments) are returned for retrospective validation purposes. If the run-off 
-#' triangle is provided,then algorithm caclulates back-fitted (incremental)
-#'residuals instead (see Maciak, Mizera, and Pešta (2022) for details).
+#' details). If a full data matrix is provided as the input then the algorithms  
+#' uses only on the relevant part of the data---the run-off triangle only (i.e., the 
+#' top-left triangular part of the matrix) but standard incremental residuals 
+#' (true incremental payments minus predicted increments) are returned for 
+#' retrospective validation purposes (if \code{residuals = TRUE}). If the run-off 
+#' triangle is provided only,then the algorithm caclulates so-called back-fitted 
+#' (incremental) residuals instead (see Maciak, Mizera, and Pešta (2022) for details).
 #'
 #' @param chainLadder cumulative or incremental run-off triangle (the triangle 
 #' must be of the class \code{triangle} or \code{matrix}) in terms of a square 
@@ -26,7 +26,8 @@
 #' in terms of the backfitting approach (see Maciak, Mizera, and Pesta (2022) 
 #' for further details)
 #' 
-#' @returns An object of the class \code{list} with with the following elements: 
+#' @returns An object of the class \code{profileLadder} which is a list with 
+#' the following elements: 
 #' \item{reserve}{numeric vector with four values summarizing the reserve: Total 
 #' paid amount (i.e., the sum of the last observed diagonal in a cumulative run-off 
 #' triangle); Total estimated amount (i.e., the sum of the last column in the 
@@ -36,11 +37,11 @@
 #' \code{chainLadder} is provided in the input (i.e., the sum of the last column 
 #' in \code{chainLadder} minus the sum of the last diagonal in \code{chainLadder})}
 #' \item{method}{algorithm used for the reserve estimation (PARALLAX or REACT)}
-#' \item{completed}{completed functional development profiles (the 
+#' \item{Triangle}{the run-off triangle considered as the input for the 
+#' underlying estimation algorithm (PARALLAX or REACT)}
+#' \item{FullTriangle}{completed functional development profiles (the 
 #' lower-right triangular part in \code{completed}) estimated by the 
 #' PARALLAX algorithm or the REACT algorithm}
-#' \item{inputTriangle}{the run-off triangle considered as the input for the 
-#' underlying estimation algorithm (PARALLAX or REACT)}
 #' \item{trueCompleted}{true (complete) run-off triangle (if available) and 
 #' \code{NA} value provided otherwise}
 #' \item{residuals}{a triangle with the corresponding residuals (for 
@@ -49,14 +50,13 @@
 #' is not available) or the residuals are given in the lower-right triangle (i,e., 
 #' standard incremental residuals---if the true completed triangle is given)}
 #'  
-#' @seealso [permuteReserve()], [mcReserve()]
+#' @seealso [mcReserve()], [permuteReserve()], [summary.profileLadder()]
 #'  
 #' @examples
 #' ## run-off (upper-left) triangle with NA values (bottom-right part)
-#' if (requireNamespace("ChainLadder")) {
 #' data(MW2014, package = "ChainLadder")
 #' print(MW2014) 
-#' parallelReserve(MW2014, residuals = TRUE)}
+#' parallelReserve(MW2014, residuals = TRUE)
 #' 
 #' ## completed run-off triangle with 'unknown' truth (lower-bottom part)  
 #' ## for the estimation purposes only the upper-left triangle is used 
@@ -213,8 +213,8 @@ parallelReserve <- function(chainLadder, method = "parallax", cum = TRUE, residu
   output <- list()
   output$reserve <- reserveOutput
   output$method <- paste(methodType, " method (functional profile completion)", sep = "")
-  output$completed <- ChainLadder::as.triangle(completed)
-  output$inputTriangle <- ChainLadder::as.triangle(inputTriangle)
+  output$Triangle <- ChainLadder::as.triangle(inputTriangle)
+  output$FullTriangle <- ChainLadder::as.triangle(completed)
   if (all(is.na(chainLadder[!observed(n)]))){
     output$trueComplete <- NA
   } else {

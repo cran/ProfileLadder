@@ -31,6 +31,6 @@ March 22nd -- March 28th, 2020 (e.g., Jindřichův Hradec, Klatovy, Teplice).
 }
 \details{
 The cumulative reported cases are provided in the table for 8 consecutive
-development periods (where the periods represent seven consecutive days)
+development periods (where each period represents seven consecutive days)
 starting in March 1st, 2020.
 }

@@ -27,15 +27,20 @@
 #' @export
 #' @method print permutedReserve
 print.permutedReserve <- function(x, ...){
+
   ### estimation methods
-  methods <- c("PARALLAX", "REACT", "MACRAME")
+  methods <- c("PARALLAX", "REACT", "MACRAME", "GLM", "Mack model", "Tweedie model")
   method <- methods[methods %in% unlist(regmatches(x$method, 
                     gregexpr(paste(methods, collapse = "|"), x$method)))]
   
-  message(paste(method, " based reserving", sep = ""))
-  print(round(x$eSummary, 3))
+  ## global colors for fancy print 
+  colors <- getOption("profileLadder.colors")
+  col.info <- colors$col.info
+  
+  message(col.info(paste(method, " based reserving", sep = "")))
+  print(round(x$eSummary[c(3,2,1,4)], 3))
   
   B <- unlist(strsplit(x$info[3], " = "))[2]
-  message(paste("Permutation bootstrap (B = ", B, ")", sep = ""))
+  message(col.info(paste("Permutation bootstrap (B = ", B, ")", sep = "")))
   print(round(x$pSummary, 3))
 }

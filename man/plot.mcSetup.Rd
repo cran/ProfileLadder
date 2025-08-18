@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.mcSetup.R
 \name{plot.mcSetup}
 \alias{plot.mcSetup}
-\title{Plotting the Run-Off Triangle Increments by the MC Setting}
+\title{Visualization of the Run-Off Triangle Increments  for the Markov Chain}
 \usage{
 \method{plot}{mcSetup}(x, ...)
 }
@@ -13,13 +13,19 @@ of the \code{incrExplor()} function}
 \item{...}{other graphical parameters to plot}
 }
 \value{
-The function returns a layout with two plots. ...
+The function returns a layout with two plots: A histogram with the
+run-off triangle increments and the barplot with the increments being distributed
+into the given set of bins
 }
 \description{
 The function provides a graphical visualization of the results obtained from
-the function \code{incrExplor()}. In particular, the considered run-off triangle
+the \code{incrExplor()} function. In particular, the considered run-off triangle
 increments are distributed into the bins according the given Markov chain breaks
-or states.
+and states. Two figures are provided: The first figure contains a histogram
+of the standard incremental residuals with a conrresponding kernel density
+estimate. The second figure shows how the increments are distributed into the
+given set of bins (defined by the break points). In addition, the corresponding
+Markov chain states are displayed
 }
 \examples{
 ## run-off triangle increments within the default bins
