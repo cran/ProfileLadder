@@ -11,11 +11,14 @@
 of one of the functions \code{parallelReserve()}, \code{mcReserve}, or
 \code{as.profileLadder()}}
 
-\item{fancy.print}{logical to indicate whether facty run-off triangle should be
-printed or standard output is used instead. The default choice is \code{TRUE}.
-Fancy printng output can be supressed by \code{options(profileLadder.fancy = FALSE)}.}
+\item{fancy.print}{logical to indicate whether fancy run-off triangle should be
+printed or a standard output should be used instead. The default choice is \code{TRUE}.
+Note that that fancy print option uses by DEFAULT zero decimal digits.
+Specific colors for the fancy print option and the number of decimal points
+to be used can be set by the function \code{set.fancy.print()}.
+The fancy print option can be supressed by \code{options(profileLadder.fancy = FALSE)}.}
 
-\item{...}{further arguments passed to \code{print}}
+\item{...}{further arguments passed to \code{print()}}
 }
 \value{
 displays information resulting from a call of the \code{parallelReserve()}
@@ -41,5 +44,5 @@ print(x)
 
 }
 \seealso{
-\code{\link[=as.profileLadder]{as.profileLadder()}}, \code{\link[=parallelReserve]{parallelReserve()}}, \code{\link[=mcReserve]{mcReserve()}}
+\code{\link[=as.profileLadder]{as.profileLadder()}}, \code{\link[=set.fancy.print]{set.fancy.print()}}, \code{\link[=parallelReserve]{parallelReserve()}}, \code{\link[=mcReserve]{mcReserve()}}
 }

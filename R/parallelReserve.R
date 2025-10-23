@@ -92,16 +92,19 @@ parallelReserve <- function(chainLadder, method = "parallax", cum = TRUE, residu
   if (!is.numeric(chainLadder[observed])){stop("The input values are not numeric.")}
   
   if (cum == TRUE){
-    if (sum(chainLadder[last]) < sum(chainLadder[,1])){
-      warning("The input run-off triangle seems to be not of the cumultative type!")}
+    if (sum(chainLadder[last]) <= sum(chainLadder[,1])){
+      warning("The input run-off triangle seems to be not of the cumultative type!")
+    }
   } else {
     if (sum(chainLadder[last]) > sum(chainLadder[,1])){
-      warning("The input run-off triangle seems to be of a cumulative type!")}
+      warning("The input run-off triangle seems to be of a cumulative type!")
+    }
     chainLadder <- ChainLadder::incr2cum(chainLadder)
   }
   
   if (sum(is.na(chainLadder[observed])) > 0){
-    stop("The run-off triangle is not fully observed (missing values).")}
+    stop("The run-off triangle is not fully observed (missing values).")
+    }
   
   if (sum(as.numeric(is.na(chainLadder[!observed]))) > 0){
     ### backfitted residuals

@@ -67,7 +67,12 @@ plot.permutedReserve <- function(x, ...){
     on.exit(graphics::par(old_par))
     ###
     
-    graphics::par(mfrow = c(2,2), mar = c(5, 3, 5, 3), cex = scaleFac)
+    if (!all(is.na(pUltimates)) & !all(is.na(pLatest))){### four panel plot
+      graphics::par(mfrow = c(2,2), mar = c(5, 3, 5, 3), cex = scaleFac)
+    } else {### two panel plot 
+      graphics::par(mfrow = c(1,2), mar = c(5, 3, 5, 3), cex = scaleFac)
+    }
+    
   
     
     ### plot 1
@@ -144,48 +149,50 @@ plot.permutedReserve <- function(x, ...){
     }
     
     
-    ### plot 3
-    graphics::boxplot(pUltimates, main = "Permuted ultimate claims\n (the last column)", 
-                      ylim = c(min(pUltimates), 1.4 * max(pUltimates)),
-                      xlab = "Origin period", ylab = "Ultimate claims",
-                      col = "#D6EDF3", pch = 22, cex = 0.8)
+    if (!all(is.na(pUltimates)) & !all(is.na(pLatest))){### plot only if pUltimates and pLatest are provided
+      ### plot 3
+      graphics::boxplot(pUltimates, main = "Permuted ultimate claims\n (the last column)", 
+                        ylim = c(min(pUltimates), 1.4 * max(pUltimates)),
+                        xlab = "Origin period", ylab = "Ultimate claims",
+                        col = "#D6EDF3", pch = 22, cex = 0.8)
       
-    xVal <- t(cbind((1:n) - 0.4, (1:n + 0.4)))
-    yVal <- t(matrix(rep(apply(pUltimates, 2, mean), 2), nrow = n))
-    
-    graphics::matlines(xVal, yVal, col = "red", lwd = 2, lty = 1)
-    
-    if (all(!is.na(trueUltimate))){
-      graphics::points(1:n, trueUltimate, pch = 22, bg = "#666666", cex = 1.4)
+      xVal <- t(cbind((1:n) - 0.4, (1:n + 0.4)))
+      yVal <- t(matrix(rep(apply(pUltimates, 2, mean), 2), nrow = n))
       
-      graphics::legend("topleft", legend = c("Permutation bootstrap ultimates", "Permutation bootstrap means", "True ultimates"), 
-                       pch = 22, pt.bg = c("#D6EDF3", "red", "#666666"), fill = "lightgray", 
-                       inset = inSet, x.intersp = xInter, y.intersp = yInter,
-                       border = "lightgray", box.lwd = 0, box.col = "white", bg = "white", pt.cex = 1.5)
-    } else {
-      graphics::legend("topleft", legend = c("Permutation bootstrap ultimates", "Permutation bootstrap means"), 
-                       pch = 22, pt.bg = c("#D6EDF3", "red"), fill = "lightgray", 
+      graphics::matlines(xVal, yVal, col = "red", lwd = 2, lty = 1)
+      
+      if (all(!is.na(trueUltimate))){
+        graphics::points(1:n, trueUltimate, pch = 22, bg = "#666666", cex = 1.4)
+        
+        graphics::legend("topleft", legend = c("Permutation bootstrap ultimates", "Permutation bootstrap means", "True ultimates"), 
+                         pch = 22, pt.bg = c("#D6EDF3", "red", "#666666"), fill = "lightgray", 
+                         inset = inSet, x.intersp = xInter, y.intersp = yInter,
+                         border = "lightgray", box.lwd = 0, box.col = "white", bg = "white", pt.cex = 1.5)
+      } else {
+        graphics::legend("topleft", legend = c("Permutation bootstrap ultimates", "Permutation bootstrap means"), 
+                         pch = 22, pt.bg = c("#D6EDF3", "red"), fill = "lightgray", 
+                         inset = inSet, x.intersp = xInter, y.intersp = yInter,
+                         border = "lightgray", box.lwd = 0, box.col = "white", bg = "white", pt.cex = 1.5)
+      }
+      
+      
+      ### plot 4
+      graphics::boxplot(pLatest, main = "Latest incremental claims\n (actual vs. simulated)", 
+                        ylim = c(min(pLatest), 1.2 * max(pLatest)), 
+                        xlab = "Origin period", ylab = "Latest incremental claims",
+                        col = "#D6EDF3", pch = 22, cex = 0.8)
+      
+      xVal <- t(cbind((1:n) - 0.4, (1:n + 0.4)))
+      yVal <- t(matrix(rep(apply(pLatest, 2, mean), 2), nrow = n))
+      
+      graphics::matlines(xVal, yVal, col = "red", lwd = 2, lty = 1)
+      graphics::points(1:n, trueLatest, pch = 22, bg = "darkblue", cex = 1.2)
+      
+      graphics::legend("topleft", legend = c("Permutation bootstrap diagonals", "Permutation bootstrap means", "Actual latests (run-off diagonal)"), 
+                       pch = 22, pt.bg = c("#D6EDF3", "red", "darkblue"), fill = "lightgray", 
                        inset = inSet, x.intersp = xInter, y.intersp = yInter,
                        border = "lightgray", box.lwd = 0, box.col = "white", bg = "white", pt.cex = 1.5)
     }
-    
-    
-    ### plot 4
-    graphics::boxplot(pLatest, main = "Latest incremental claims\n (actual vs. simulated)", 
-                      ylim = c(min(pLatest), 1.2 * max(pLatest)), 
-                      xlab = "Origin period", ylab = "Latest incremental claims",
-                      col = "#D6EDF3", pch = 22, cex = 0.8)
-    
-    xVal <- t(cbind((1:n) - 0.4, (1:n + 0.4)))
-    yVal <- t(matrix(rep(apply(pLatest, 2, mean), 2), nrow = n))
-    
-    graphics::matlines(xVal, yVal, col = "red", lwd = 2, lty = 1)
-    graphics::points(1:n, trueLatest, pch = 22, bg = "darkblue", cex = 1.2)
-    
-    graphics::legend("topleft", legend = c("Permutation bootstrap diagonals", "Permutation bootstrap means", "Actual latests (run-off diagonal)"), 
-                     pch = 22, pt.bg = c("#D6EDF3", "red", "darkblue"), fill = "lightgray", 
-                     inset = inSet, x.intersp = xInter, y.intersp = yInter,
-                     border = "lightgray", box.lwd = 0, box.col = "white", bg = "white", pt.cex = 1.5)
 }
 
 

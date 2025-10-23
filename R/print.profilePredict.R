@@ -1,46 +1,32 @@
-#' Print Objects of the S3 Class \code{profileLadder}
+#' Print Objects of the S3 Class \code{profilePredict}
 #'
-#' Function to organize and print the outputs provided by the function 
-#' \code{parallelReserve()} and the function \code{mcReserve}
+#' Function to organize and print the 1-year prediction based on the PARALLAX and REACT
+#' algorithm  (\code{parallelReserve()}) or the MACRAME algorithm (\code{mcReserve()})
 #'
 #' @param x an object of the class \code{profileLadder} resulting from a call 
-#' of one of the functions \code{parallelReserve()}, \code{mcReserve}, or
-#' \code{as.profileLadder()}
-#' @param fancy.print logical to indicate whether fancy run-off triangle should be 
-#' printed or a standard output should be used instead. The default choice is \code{TRUE}.
-#' Note that that fancy print option uses by DEFAULT zero decimal digits.
+#' of one of the functions \code{parallelReserve()} or \code{mcReserve}
+#' @param fancy.print logical to indicate whether a fancy run-off triangle should be 
+#' printed in the output (DEFAULT) or a standard print option should be used instead. 
+#' Note that that the fancy print option uses, by DEFAULT, zero number of decimal digits.
 #' Specific colors for the fancy print option and the number of decimal points 
 #' to be used can be set by the function \code{set.fancy.print()}. 
 #' The fancy print option can be supressed by \code{options(profileLadder.fancy = FALSE)}.
-#' 
 #' @param ... further arguments passed to \code{print()}
 #' 
-#' @return displays information resulting from a call of the \code{parallelReserve()} 
-#' function or the \code{mcReserve} function
+#' @return displays information resulting from a call of the \code{predict()} applied to the 
+#' output of the \code{parallelReserve()} or \code{mcReserve()} function---the one year ahead 
+#' prediction in the run-off triagle
 #' 
-#' @seealso [as.profileLadder()], [set.fancy.print()], [parallelReserve()], [mcReserve()]
+#' @seealso [parallelReserve()], [mcReserve()], [set.fancy.print()]
 #' 
 #' @examples
 #' data(CameronMutual)
-#' ## full run-off triangle printed with the fancy mode
-#' x <- as.profileLadder(CameronMutual)
-#' print(x) 
-#' 
-#' ## run-off triangle with unobserved future payments 
-#' x <- as.profileLadder(observed(CameronMutual))
-#' print(x) 
-#' 
-#' ## the same run-off triangle using a standard printing method 
-#' options(profileLadder.fancy = FALSE)
-#' print(x)
+#' predict(parallelReserve(CameronMutual))
 #' 
 #' @export
-#' @method print profileLadder
-print.profileLadder <- function(x, fancy.print = getOption("profileLadder.fancy", TRUE), ...){
-  cat(paste(unlist(strsplit(x$method, " "))[1], "Reserving \n", sep = " "))
-  print(x$reserve[c(3,2,1,4)])
-  cat("\n")
-  
+#' @method print profilePredict
+print.profilePredict <- function(x, fancy.print = getOption("profileLadder.fancy", TRUE), ...){
+
   ### global colors for fancy print
   colors <- getOption("profileLadder.colors")
   col.known     <- colors$col.known
@@ -53,13 +39,12 @@ print.profileLadder <- function(x, fancy.print = getOption("profileLadder.fancy"
   print_color <- function(triangle, digits = digits.info, unknown = FALSE){
     triangle <- as.matrix(triangle)
     n <- nrow(triangle)
+    m <- ncol(triangle)
     
-    
-
     # Convert all values to character with fixed decimals
-    char_mat <- matrix(NA_character_, n, n)
+    char_mat <- matrix(NA_character_, n, m)
     for (i in 1:n) {
-      for (j in 1:n) {
+      for (j in 1:m) {
         val <- triangle[i, j]
         if (is.na(val)) {
           char_mat[i, j] <- "NA"
@@ -70,9 +55,9 @@ print.profileLadder <- function(x, fancy.print = getOption("profileLadder.fancy"
     }
     
     # Split integer and fractional parts per column
-    int_parts <- matrix(NA_character_, n, n)
-    frac_parts <- matrix(NA_character_, n, n)
-    for (j in 1:n) {
+    int_parts <- matrix(NA_character_, n, m)
+    frac_parts <- matrix(NA_character_, n, m)
+    for (j in 1:m) {
       for (i in 1:n) {
         x <- char_mat[i, j]
         if (x == "NA") {
@@ -92,7 +77,7 @@ print.profileLadder <- function(x, fancy.print = getOption("profileLadder.fancy"
     
     # Print row by row
     for (i in 1:n) {
-      for (j in 1:n) {
+      for (j in 1:m) {
         # Compose aligned string: right-align int, left-align frac with dot
         if (int_parts[i, j] == "NA") {
           aligned_num <- format("NA", width = max_int_width[j] + 1 + max_frac_width[j], justify = "centre")
@@ -125,29 +110,14 @@ print.profileLadder <- function(x, fancy.print = getOption("profileLadder.fancy"
     }
   }
   
-  message(col.info(x$method))
-  if (all(is.na(x$FullTriangle))){### no imputed profiles available
-    if (all(is.na(x$trueComplete[!observed(dim(x$Triangle)[1])]))){### no complete (true) triangle available
+
+
       if (fancy.print){
-        print_color(x$Triangle)
+        print_color(x$extTriangle)
       } else {
-        print(x$Triangle)
+        print(x$extTriangle)
       }
-    } else {
-      if (fancy.print){
-        print_color(x$trueComplete, unknown = TRUE)
-      } else {
-        print(x$trueComplete)
-      }
-    }
-  } else {
-    if (fancy.print){
-      print_color(x$FullTriangle)
-    } else {
-      print(x$FullTriangle)
-    }
-  }
-  invisible(x)
+ 
 }
 
 

@@ -8,7 +8,8 @@ set.fancy.print(
   color.known = "#333333",
   color.predicted = "#CC00CC",
   color.unknown = "#999999",
-  color.info = "#CC00CC"
+  color.info = "#CC00CC",
+  display.digits = 0
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ evaluations)}
 
 \item{color.info}{Color (e.g., a hexadecimal code) for the information messages in the outputs
 of the prediction functions \code{parallelReserve()}, \code{mcReserve()}, and \code{permuteReserve()}}
+
+\item{display.digits}{the number of digits to be used when using the fancy print option
+for run-off triangles. No decimal point are used by DEFAULT (i.e., \code{display.digits = 0} by DEFAULT)}
 }
 \value{
 Sets the  user-defined option for fancy print color styles
@@ -35,6 +39,10 @@ and the overall output presentation
 \examples{
 ## fancy print option for the run-off triangle 
 print(as.profileLadder(observed(CameronMutual)), fancy.print = TRUE)
+
+## fancy print option for the run-off triangle with two decimals
+set.fancy.print(display.digits = 2)
+print(as.profileLadder(observed(CameronMutual)))
 
 ## standard print option for the run-off triangle
 print(as.profileLadder(observed(CameronMutual)), fancy.print = FALSE)

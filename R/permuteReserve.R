@@ -27,6 +27,12 @@
 #' permutation or the same set of Markov states and breaks is used for each permuted
 #' run-off triangle (only applies if the input \code{object} is an output 
 #' of the MACRAME algorithm---the function \code{mcReserve()})
+#' @param outputAll logical to indicate whether whole permuted triangles should 
+#' be stored and provided in the output (\code{outputAll = TRUE} set by default), 
+#' or just the main summary characteristics are given instead (\code{outputAll = FALSE})
+#' @param pb logical (\code{TRUE} by DEFAULT) to indicate whether a progress bar 
+#' for bootstrap resampling should be used or not (required the R package \code{pbapply})
+#' to be installed
 #' 
 #' @returns An object of the class \code{permutedReserve} which is a list with  
 #' the following elements: 
@@ -49,18 +55,20 @@
 #' \item{pReserves}{a numeric vector of the length \code{B} with the estimated 
 #' (permuted) reserves for each row-permuted run-off triangle in \code{B} 
 #' independent Monte Carlo simulation runs}
-#' \item{pUltimates}{A matrix of the dimensions \code{B x n} (where \code{n} 
-#' stands for the number of the origin/development periods) with \code{B} simulated 
-#' ultimate payments -- the last column in the completed run-off triangle}
-#' \item{pLatest}{A matrix of the dimensions \code{B x n} (where \code{n} again
-#' stands for the number of the origin/development periods) with \code{B} simulated 
-#' incremental diagonals}
-#' \item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the 
-#' number of the origin/development periods) with \code{B} simulated cumulative
-#' diagonals}
-#' \item{pFirst}{A matrix of the dimension \code{B x n} (\code{n} being the 
-#' number of the origin/development periods) with \code{B} simulated first payment 
-#' columns (all columns are identical for \code{std = TRUE})}
+#' \item{pUltimates}{A matrix of the dimensions \code{B x n} (provided in the output 
+#' if \code{outputAll = TRUE}) where \code{n} 
+#' stands for the number of the origin/development periods and \code{B} is the number 
+#' os simulated ultimate payments --the last column in the completed run-off triangle.}
+#' \item{pLatest}{A matrix of the dimensions \code{B x n} (provided in the output 
+#' if \code{outputAll = TRUE}) where \code{n} again stands for the number of the 
+#' origin/development periods and \code{B} is the number of simulated incremental diagonals}
+#' \item{pLatestCum}{A matrix of the dimensions \code{B x n} (provided in the output 
+#' if \code{outputAll = TRUE}) where \code{n} is the number of the origin/development periods
+#' and \code{B} stands for the number of simulated cumulative diagonals}
+#' \item{pFirst}{A matrix of the dimension \code{B x n} (provided in the output 
+#' if \code{outputAll = TRUE}) where \code{n} stands for the number of the origin/development 
+#' periods and \code{B} is the number of simulated first payment columns 
+#' (all columns are identical for \code{std = TRUE})}
 #' \item{Triangle}{The input run-off triangle}
 #' \item{FullTriangle}{The completed run-off triangle by using one of the PARALLAX, 
 #' REACT, or MACRAME estimation method}
@@ -101,7 +109,7 @@
 #' \url{https://data.europa.eu/eli/dir/2009/138/oj}
 #' 
 #' @export
-permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjustMC = TRUE){
+permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjustMC = TRUE, outputAll = TRUE, pb = TRUE){
   ### input data checks
   if (!inherits(object, c("profileLadder", "glmReserve", "tweedieReserve", "MackChainLadder", "ChainLadder"))){
     stop("The input object must be of a class 'profileLadder', 'glmReserve', 'tweedieReserve', 'MackChainLadder' or 'ChainLadder'")}
@@ -203,12 +211,29 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjust
       if (is.null(states) & is.null(breaks)){out <- mcReserve(pMatrix)$FullTriangle} 
         else {out <- mcReserve(pMatrix, states = states, breaks = breaks)$FullTriangle}
     }  
-    return(c(out[,n], rev(out[last]), rev(ChainLadder::cum2incr(out)[last]), out[,1]))
+    if (outputAll){
+      ## last column | last diagonal | last incremental diagonal | first column
+      return(c(out[,n], rev(out[last]), rev(ChainLadder::cum2incr(out)[last]), out[,1]))
+    } else { 
+      ## last column | last diagonal
+      return(c(out[,n], rev(out[last])))
+    }
+    
   }
   
   ### permutation bootstrap with time efficiency  
   startTime <- Sys.time()
-  pReserve <- replicate(B, permute(completed, method))
+  if (pb == TRUE){ 
+    if (requireNamespace("pbapply", quietly = TRUE)){
+      pbapply::pboptions(type = "timer", char = ">", txt.width = 43)
+      pReserve <- pbapply::pbreplicate(B, permute(completed, method))
+    } else {
+      message("The R package 'pbapply' must be installed to use the progress bar")
+      pReserve <- replicate(B, permute(completed, method))
+    } 
+  } else {
+    pReserve <- replicate(B, permute(completed, method))
+  }
   endTime <- Sys.time() - startTime
     
   ### bootstrapped ultimates
@@ -219,13 +244,16 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjust
   latestCum <- data.frame(t(pReserve[(n + 1):(2 * n),]))
   names(latestCum) <- paste("origin", 1:n, sep = " ")
   
-  ### bootstrapped latest (incremental)
-  latest <- data.frame(t(pReserve[(2 * n + 1):(3 * n),]))
-  names(latest) <- paste("origin", 1:n, sep = " ")
+  if (outputAll){### full information in the output
+    ### bootstrapped latest (incremental)
+    latest <- data.frame(t(pReserve[(2 * n + 1):(3 * n),]))
+    names(latest) <- paste("origin", 1:n, sep = " ")
+    
+    ### bootstrapped first payments
+    first <- data.frame(t(pReserve[(3 * n + 1):(4 * n),]))
+    names(first) <- paste("origin", 1:n, sep = " ")
+  } 
   
-  ### bootstrapped first payments
-  first <- data.frame(t(pReserve[(3 * n + 1):(4 * n),]))
-  names(first) <- paste("origin", 1:n, sep = " ")
   
   ### bootstrapped reserves
   reserves <- apply(pReserve[1:n,],2, sum) - apply(pReserve[(n + 1):(2 * n), ], 2, sum)
@@ -253,10 +281,19 @@ permuteReserve <- function(object, B = 500, std = TRUE, quantile = 0.995, adjust
   output$method <- paste("Permutation bootstrap (", method, " method)", sep = "")
   
   output$pReserves <- as.numeric(reserves)
-  output$pUltimates <- ultimates
-  output$pLatest <- latest
-  output$pLatestCum <- latestCum
-  output$pFirst <- first
+  
+  if (outputAll){
+    output$pUltimates <- ultimates
+    output$pLatest <- latest
+    output$pLatestCum <- latestCum
+    output$pFirst <- first
+  } else {
+    output$pUltimates <- NA
+    output$pLatest <- NA
+    output$pLatestCum <- NA
+    output$pFirst <- NA
+  }
+  
   
   if (all(!is.na(trueComplete))){
     output$tUltimate <- trueComplete[,n]

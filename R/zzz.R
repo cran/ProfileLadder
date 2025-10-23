@@ -6,7 +6,8 @@
       col.known = crayon::make_style("#333333"), ### run-off triangle
       col.predicted = crayon::make_style("#CC00CC"),
       col.unknown = crayon::make_style("#999999"), 
-      col.info = crayon::make_style("#CC00CC")
+      col.info = crayon::make_style("#CC00CC"),
+      display.digits = 0
     )
     options(profileLadder.colors = default_colors)
   }

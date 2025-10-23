@@ -4,7 +4,15 @@
 \alias{permuteReserve}
 \title{Permutation Bootstrap Reserve (PARALLAX, REACT, MACRAME)}
 \usage{
-permuteReserve(object, B = 500, std = TRUE, quantile = 0.995, adjustMC = TRUE)
+permuteReserve(
+  object,
+  B = 500,
+  std = TRUE,
+  quantile = 0.995,
+  adjustMC = TRUE,
+  outputAll = TRUE,
+  pb = TRUE
+)
 }
 \arguments{
 \item{object}{an object which is the result of some functional-based reserving
@@ -32,6 +40,14 @@ chain states and the corresponding breaks should be adjusted for every bootstrap
 permutation or the same set of Markov states and breaks is used for each permuted
 run-off triangle (only applies if the input \code{object} is an output
 of the MACRAME algorithm---the function \code{mcReserve()})}
+
+\item{outputAll}{logical to indicate whether whole permuted triangles should
+be stored and provided in the output (\code{outputAll = TRUE} set by default),
+or just the main summary characteristics are given instead (\code{outputAll = FALSE})}
+
+\item{pb}{logical (\code{TRUE} by DEFAULT) to indicate whether a progress bar
+for bootstrap resampling should be used or not (required the R package \code{pbapply})
+to be installed}
 }
 \value{
 An object of the class \code{permutedReserve} which is a list with
@@ -55,18 +71,20 @@ bootstrapped mean reserve}
 \item{pReserves}{a numeric vector of the length \code{B} with the estimated
 (permuted) reserves for each row-permuted run-off triangle in \code{B}
 independent Monte Carlo simulation runs}
-\item{pUltimates}{A matrix of the dimensions \code{B x n} (where \code{n}
-stands for the number of the origin/development periods) with \code{B} simulated
-ultimate payments -- the last column in the completed run-off triangle}
-\item{pLatest}{A matrix of the dimensions \code{B x n} (where \code{n} again
-stands for the number of the origin/development periods) with \code{B} simulated
-incremental diagonals}
-\item{pLatestCum}{A matrix of the dimensions \code{B x n} (\code{n} being the
-number of the origin/development periods) with \code{B} simulated cumulative
-diagonals}
-\item{pFirst}{A matrix of the dimension \code{B x n} (\code{n} being the
-number of the origin/development periods) with \code{B} simulated first payment
-columns (all columns are identical for \code{std = TRUE})}
+\item{pUltimates}{A matrix of the dimensions \code{B x n} (provided in the output
+if \code{outputAll = TRUE}) where \code{n}
+stands for the number of the origin/development periods and \code{B} is the number
+os simulated ultimate payments --the last column in the completed run-off triangle.}
+\item{pLatest}{A matrix of the dimensions \code{B x n} (provided in the output
+if \code{outputAll = TRUE}) where \code{n} again stands for the number of the
+origin/development periods and \code{B} is the number of simulated incremental diagonals}
+\item{pLatestCum}{A matrix of the dimensions \code{B x n} (provided in the output
+if \code{outputAll = TRUE}) where \code{n} is the number of the origin/development periods
+and \code{B} stands for the number of simulated cumulative diagonals}
+\item{pFirst}{A matrix of the dimension \code{B x n} (provided in the output
+if \code{outputAll = TRUE}) where \code{n} stands for the number of the origin/development
+periods and \code{B} is the number of simulated first payment columns
+(all columns are identical for \code{std = TRUE})}
 \item{Triangle}{The input run-off triangle}
 \item{FullTriangle}{The completed run-off triangle by using one of the PARALLAX,
 REACT, or MACRAME estimation method}
